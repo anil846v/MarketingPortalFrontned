@@ -110,7 +110,7 @@ const AdminDashboard = () => {
           >
             ☰
           </button>
-          <h1>GMMC Marketing Team Portal</h1>
+          <h1>GMMC SchoolsVisited Portal</h1>
           <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </header>
 
