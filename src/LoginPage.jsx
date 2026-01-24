@@ -29,6 +29,8 @@ export default function LoginPage() {
             navigate("/admin-dashbaord", { replace: true });
           } else if (data.role === "MARKETING") {
             navigate("/marketing-dashboard", { replace: true });
+          }else {
+            navigate("/", { replace: true });
           }
         }
       }
@@ -42,7 +44,7 @@ export default function LoginPage() {
     setError(null);
 
     // Rate limiting - max 5 attempts
-    if (loginAttempts >= 5) {
+    if (loginAttempts >= 20) {
       setError("Too many login attempts. Please try again later.");
       return;
     }
@@ -104,7 +106,7 @@ export default function LoginPage() {
               <input
                 id="username"
                 type="text"
-                placeholder="Enter your username"
+                placeholder="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -118,7 +120,7 @@ export default function LoginPage() {
               <input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

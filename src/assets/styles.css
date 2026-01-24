@@ -12,6 +12,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+    background: linear-gradient(to right, #446dc6, #02efa0);
+
+}
+.error-message{
+  color :red;
 }
 
 /* Page Container */
@@ -31,6 +36,7 @@ body {
     linear-gradient(90deg, #00ABE4, #45b3ea, #0078a0) border-box;
 }
 .page-container1 {
+  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,6 +51,7 @@ body {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  
 
 }
 
@@ -65,6 +72,7 @@ body {
   font-size: 1.8rem;
   font-weight: bold;
   color: #032B2C;
+  
   margin-bottom: 20px;
   font-family:'Montserrat';  
 }
@@ -74,6 +82,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  
 }
 
 /* Form Group */
@@ -87,12 +96,16 @@ body {
 .form-label {
   font-size: 0.9rem;
   color: #010d10;
+  
   margin-bottom: 4px;
 }
 
 /* Input Fields */
 .form-input,
 .form-select {
+   background: white;
+   color:black;
+
   width: 100%;
   padding: 10px;
   border: 1px solid #00ABE4;

@@ -92,9 +92,14 @@ const HomeSection = ({ setActiveTab }) => {
     }
   };
 
-  const StatCard = ({ icon, label, value, gradient }) => (
+  const StatCard = ({ icon, label, value, gradient, tabId }) => (
     <div 
-      style={styles.statCard}
+      style={{...styles.statCard}}
+      onClick={() => {
+        if (tabId) {
+          setActiveTab(tabId);
+        }
+      }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-4px)';
         e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
@@ -155,6 +160,7 @@ const HomeSection = ({ setActiveTab }) => {
           label="Total Marketing Users"
           value={stats.totalUsers}
           gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+          tabId="users"
         />
         <StatCard
           icon={
@@ -166,6 +172,7 @@ const HomeSection = ({ setActiveTab }) => {
           label="Total School Visits"
           value={stats.totalVisits}
           gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+          tabId="visits"
         />
         <StatCard
           icon={
@@ -178,6 +185,7 @@ const HomeSection = ({ setActiveTab }) => {
           label="Total Orders"
           value={stats.totalOrders}
           gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+          tabId="orders"
         />
         <StatCard
           icon={
@@ -189,6 +197,7 @@ const HomeSection = ({ setActiveTab }) => {
           label="Active Modules"
           value={stats.activeModules}
           gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
+          tabId="modules"
         />
       </div>
 
@@ -207,7 +216,7 @@ const HomeSection = ({ setActiveTab }) => {
           gap: '12px'
         }}>
           <button 
-            onClick={() => setActiveTab('users')}
+            onClick={() => setActiveTab('users', true)}
             style={{
             padding: '12px 20px',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',

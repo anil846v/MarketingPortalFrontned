@@ -4,16 +4,27 @@ import { confirmAction } from '../components/ConfirmationProvider';
 import { API_BASE_URL } from '../config';
 import { validateEmail, validatePhone, sanitizeInput } from '../utils/validation';
 
-const UsersSection = () => {
+const UsersSection = ({ showNewUserForm, setShowNewUserForm }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [showRegisterForm, setShowRegisterForm] = useState(showNewUserForm || false);
   const [editingUser, setEditingUser] = useState(null);
   const [expandedUser, setExpandedUser] = useState(null);
 
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Sync showNewUserForm prop with local state
+  useEffect(() => {
+    if (showNewUserForm) {
+      setShowRegisterForm(true);
+      // Reset the parent state after using it
+      if (setShowNewUserForm) {
+        setShowNewUserForm(false);
+      }
+    }
+  }, [showNewUserForm, setShowNewUserForm]);
 
   const fetchUsers = async () => {
     try {
@@ -145,7 +156,7 @@ const UsersSection = () => {
         />
       )}
 
-      <table>
+      <table >
         <thead>
           <tr>
             <th>ID</th>
@@ -158,10 +169,10 @@ const UsersSection = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map(user => (
+          {users.map((user, index) => (
             <>
               <tr key={user.userId}>
-                <td>{user.userId}</td>
+      <td>{index+1}</td>
                 <td style={{ width: '150px', minWidth: '150px' }}>
                   <button
                     onClick={() => setExpandedUser(expandedUser === user.userId ? null : user.userId)}
@@ -217,6 +228,7 @@ const UsersSection = () => {
                 </td>
               </tr>
               {expandedUser === user.userId && (
+                
                 <tr>
                   <td colSpan="7" style={{ padding: '0', background: '#f8f9fa' }}>
                     <div style={{
@@ -228,6 +240,7 @@ const UsersSection = () => {
                       boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
                       position: 'relative'
                     }}>
+                      
                       <button
                         onClick={() => setExpandedUser(null)}
                         style={{
@@ -250,6 +263,23 @@ const UsersSection = () => {
                       >
                         ×
                       </button>
+                      {user.profilePhotoPath && (
+  <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+    <img
+      src={`${API_BASE_URL}${user.profilePhotoPath}`}
+      alt="Profile"
+      style={{
+        width: '90px',
+        height: '90px',
+        borderRadius: '50%',
+        objectFit: 'cover',
+        border : '2px solid #667eea'
+        
+      }}
+    />
+  </div>
+)}
+
                       <h4 style={{ margin: '0 0 16px 0', color: '#333', fontSize: '16px', fontWeight: '600' }}>User Details</h4>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
                         <div>
@@ -261,6 +291,7 @@ const UsersSection = () => {
                             <p style={{ margin: '4px 0' }}><strong>Age:</strong> {user.age || 'N/A'}</p>
                             <p style={{ margin: '4px 0' }}><strong>Gender:</strong> {user.gender || 'N/A'}</p>
                           </div>
+                          
                         </div>
                         <div>
                           <strong style={{ color: '#666', fontSize: '12px', textTransform: 'uppercase' }}>Work Information</strong>
@@ -268,6 +299,7 @@ const UsersSection = () => {
                             <p style={{ margin: '4px 0' }}><strong>Username:</strong> {user.username}</p>
                             <p style={{ margin: '4px 0' }}><strong>User ID:</strong> {user.userId}</p>
                             <p style={{ margin: '4px 0' }}><strong>Status:</strong> 
+
                               <span style={{
                                 marginLeft: '8px',
                                 padding: '2px 8px',
@@ -308,6 +340,11 @@ const RegisterForm = ({ onSuccess, onCancel }) => {
     fullName: '', email: '', password: '', phoneNumber: '',
     age: '', gender: 'Male', address: '', assignedRegion: '', targetDistricts: ''
   });
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
+
+  // 🔥 FIXED: Initialize FormData
+  const formDataToSend = new FormData();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -349,6 +386,9 @@ const RegisterForm = ({ onSuccess, onCancel }) => {
     }
     
     try {
+      // 🔥 FIXED: Create fresh FormData for each submission
+      const formDataToSend = new FormData();
+      
       const payload = {
         fullName: sanitizeInput(formData.fullName),
         email: sanitizeInput(formData.email),
@@ -361,23 +401,57 @@ const RegisterForm = ({ onSuccess, onCancel }) => {
         targetDistricts: sanitizeInput(formData.targetDistricts)
       };
       
+      // 🔥 Append JSON as Blob for @RequestPart("userData")
+      formDataToSend.append('userData', new Blob([JSON.stringify(payload)], {
+        type: 'application/json'
+      }));
+      
+      if (photoFile) {
+        formDataToSend.append('photo', photoFile);
+      }
+
       const response = await fetch(`${API_BASE_URL}/admin/register-marketing-user`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(payload)
+        body: formDataToSend
       });
       
       const data = await response.json();
       
       if (response.ok) {
         showToast(data.message || 'User created successfully', 'success');
+        // Reset form including photo
+        setFormData({
+          fullName: '', email: '', password: '', phoneNumber: '',
+          age: '', gender: 'Male', address: '', assignedRegion: '', targetDistricts: ''
+        });
+        setPhotoFile(null);
+        setPhotoPreview(null);
         onSuccess();
       } else {
         showToast('Error: ' + (data.error || 'Failed to create user'), 'error');
       }
     } catch (error) {
       showToast('Failed to create user. Please try again.', 'error');
+    }
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Photo must be less than 5MB', 'error');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        showToast('Please select an image file', 'error');
+        return;
+      }
+      
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setPhotoPreview(e.target.result);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -427,6 +501,46 @@ const RegisterForm = ({ onSuccess, onCancel }) => {
           <label>Address</label>
           <textarea placeholder="Enter complete address" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
         </div>
+        <div className="form-field full-width">
+          <label>Profile Photo (Optional)</label>
+          <input 
+            type="file" 
+            accept="image/*" 
+            onChange={handlePhotoChange}
+          />
+          {photoPreview && (
+            <div style={{ marginTop: '8px' }}>
+              <img 
+                src={photoPreview} 
+                alt="Preview" 
+                style={{ 
+                  maxWidth: '200px', 
+                  maxHeight: '200px', 
+                  borderRadius: '8px',
+                  border: '1px solid #e5e5e5'
+                }} 
+              />
+              <button 
+                type="button"
+                onClick={() => {
+                  setPhotoFile(null);
+                  setPhotoPreview(null);
+                }}
+                style={{
+                  marginLeft: '12px',
+                  padding: '4px 8px',
+                  fontSize: '12px',
+                  background: '#f8d7da',
+                  color: '#842029',
+                  border: '1px solid #f5c2c7',
+                  borderRadius: '4px'
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <div className="form-actions">
         <button type="button" onClick={onCancel}>Cancel</button>
@@ -441,6 +555,8 @@ const UpdateForm = ({ userId, onSuccess, onCancel }) => {
     fullName: '', email: '', password: '', phoneNumber: '', age: '', gender: 'Male',
     address: '', assignedRegion: '', targetDistricts: ''
   });
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -449,9 +565,7 @@ const UpdateForm = ({ userId, onSuccess, onCancel }) => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/marketing-users`, {
-        credentials: 'include'
-      });
+      const response = await fetch(`${API_BASE_URL}/admin/marketing-users`, { credentials: 'include' });
       const data = await response.json();
       if (response.ok) {
         const user = data.users.find(u => u.userId === userId);
@@ -467,6 +581,9 @@ const UpdateForm = ({ userId, onSuccess, onCancel }) => {
             assignedRegion: user.assignedRegion || '',
             targetDistricts: user.targetDistricts || ''
           });
+          if (user.profilePhotoPath) {
+            setPhotoPreview(`${API_BASE_URL}${user.profilePhotoPath}`);
+          }
         }
       } else {
         showToast('Failed to fetch user data', 'error');
@@ -477,60 +594,59 @@ const UpdateForm = ({ userId, onSuccess, onCancel }) => {
       setLoading(false);
     }
   };
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Photo must be less than 5MB', 'error');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        showToast('Please select an image file', 'error');
+        return;
+      }
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setPhotoPreview(e.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
 
-  const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Create FormData for multipart request
+      const formDataToSend = new FormData();
       const payload = {};
+
       if (formData.fullName) payload.fullName = sanitizeInput(formData.fullName);
-      if (formData.email) {
-        if (!validateEmail(formData.email)) {
-          showToast('Please enter a valid email address', 'error');
-          return;
-        }
-        payload.email = sanitizeInput(formData.email);
-      }
-      if (formData.password) {
-        if (formData.password.length < 6) {
-          showToast('Password must be at least 6 characters long', 'error');
-          return;
-        }
-        payload.password = formData.password;
-      }
-      if (formData.phoneNumber) {
-        if (!validatePhone(formData.phoneNumber)) {
-          showToast('Please enter a valid phone number', 'error');
-          return;
-        }
-        payload.phoneNumber = sanitizeInput(formData.phoneNumber);
-      }
-      if (formData.age) {
-        const age = parseInt(formData.age);
-        if (age < 18 || age > 100) {
-          showToast('Age must be between 18 and 100', 'error');
-          return;
-        }
-        payload.age = age;
-      }
+      if (formData.email && validateEmail(formData.email)) payload.email = sanitizeInput(formData.email);
+      if (formData.password && formData.password.length >= 6) payload.password = formData.password;
+      if (formData.phoneNumber && validatePhone(formData.phoneNumber)) payload.phoneNumber = sanitizeInput(formData.phoneNumber);
+      if (formData.age) payload.age = parseInt(formData.age);
       if (formData.gender) payload.gender = formData.gender;
       if (formData.address) payload.address = sanitizeInput(formData.address);
       if (formData.assignedRegion) payload.assignedRegion = sanitizeInput(formData.assignedRegion);
       if (formData.targetDistricts) payload.targetDistricts = sanitizeInput(formData.targetDistricts);
-      
+
+      formDataToSend.append('userData', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+      if (photoFile) {
+        formDataToSend.append('photo', photoFile);
+      }
+
       const response = await fetch(`${API_BASE_URL}/admin/update-marketing-user/${userId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(payload)
+        body: formDataToSend // multipart/form-data
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         showToast(data.message || 'User updated successfully', 'success');
         onSuccess();
       } else {
-        showToast('Failed to update user', 'error');
+        showToast('Failed to update user: ' + (data.error || ''), 'error');
       }
     } catch (error) {
       showToast('Unable to connect to server', 'error');
@@ -538,7 +654,6 @@ const UpdateForm = ({ userId, onSuccess, onCancel }) => {
   };
 
   if (loading) return <div className="loading">Loading user data...</div>;
-
   return (
     <form onSubmit={handleSubmit} className="enhanced-form edit-form">
       <div className="form-header">
@@ -584,6 +699,17 @@ const UpdateForm = ({ userId, onSuccess, onCancel }) => {
         <div className="form-field full-width">
           <label>Address</label>
           <textarea placeholder={formData.address || 'Address'} value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
+        </div>
+         {/* 🔥 Photo Upload */}
+        <div className="form-field full-width">
+          <label>Profile Photo</label>
+          <input type="file" accept="image/*" onChange={handlePhotoChange} />
+          {photoPreview && (
+            <div style={{ marginTop: '8px' }}>
+              <img src={photoPreview} alt="Preview" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '8px', border: '1px solid #e5e5e5' }} />
+              <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); }} style={{ marginLeft: '12px', padding: '4px 8px', fontSize: '12px', background: '#f8d7da', color: '#842029', border: '1px solid #f5c2c7', borderRadius: '4px' }}>Remove</button>
+            </div>
+          )}
         </div>
       </div>
       <div className="form-actions">

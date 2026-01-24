@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+
 const API_BASE_URL = 'http://localhost:9090/api/marketing';
 
 const Announcements = () => {

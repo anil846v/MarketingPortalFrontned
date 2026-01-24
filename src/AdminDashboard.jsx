@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from './config';
 import './assets/AdminDashboard.css';
+import './AdminDashboard/adminmobile.css';
 import SideMenu from './AdminDashboard/SideMenu';
 import HomeSection from './AdminDashboard/Home';
 import UsersSection from './AdminDashboard/Users';
@@ -13,6 +14,7 @@ import MessagesSection from './AdminDashboard/Messages';
 import ProfileSection from './AdminDashboard/Profile';
 import ToastContainer from './components/ToastContainer';
 import ConfirmationProvider from './components/ConfirmationProvider';
+import { authFetch } from './utils/authFetch';
 
 const adminMenuItems = [
   { id: 'home', label: 'Home', icon: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
@@ -28,7 +30,42 @@ const adminMenuItems = [
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showNewUserForm, setShowNewUserForm] = useState(false);
   const navigate = useNavigate();
+  const sessionCheckInterval = 5 * 60 * 1000; // 5 minutes
+
+  // Handle tab switching with optional form opening
+  const handleSetActiveTab = (tabId, openForm = false) => {
+    if (openForm) {
+      setShowNewUserForm(true);
+    } else {
+      setShowNewUserForm(false);
+    }
+    setActiveTab(tabId);
+  };
+
+  // Validate session on component mount and set up periodic checks
+  useEffect(() => {
+    const validateSession = async () => {
+      try {
+        await authFetch(`${API_BASE_URL}/auth/validate`, { method: 'POST' });
+      } catch (error) {
+        // authFetch already redirects on 401/403
+        console.error('Session validation error:', error);
+      }
+    };
+
+    // Check on mount
+    validateSession();
+
+    // Set up periodic session checks (every 5 minutes)
+    const intervalId = setInterval(() => {
+      validateSession();
+    }, sessionCheckInterval);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
+  }, []);
 
   const handleLogout = async () => {
     const { confirmAction } = await import('./components/ConfirmationProvider');
@@ -42,12 +79,11 @@ const AdminDashboard = () => {
     
     if (confirmed) {
       try {
-        await fetch(`${API_BASE_URL}/auth/logout`, {
-          method: 'POST',
-          credentials: 'include'
+        await authFetch(`${API_BASE_URL}/auth/logout`, {
+          method: 'POST'
         });
       } catch (error) {
-        // Ignore errors
+        // Ignore errors, authFetch will handle redirects
       }
       window.location.replace('/login');
     }
@@ -59,20 +95,28 @@ const AdminDashboard = () => {
         title="Admin"
         menuItems={adminMenuItems}
         activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
+        setActiveTab={handleSetActiveTab} 
         sidebarOpen={sidebarOpen} 
         setSidebarOpen={setSidebarOpen} 
       />
 
       <div className="main-content">
         <header className="top-header">
-          <h1>Marketing Team Portal</h1>
+         <button 
+            className="menu-toggle" 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            style={{ display: 'none' }}
+            id="mobile-menu-toggle"
+          >
+            ☰
+          </button>
+          <h1>GMMC Marketing Team Portal</h1>
           <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </header>
 
         <main className={`content-area ${activeTab === 'messages' ? 'no-padding' : ''}`}>
-          {activeTab === 'home' && <HomeSection setActiveTab={setActiveTab} />}
-          {activeTab === 'users' && <UsersSection />}
+          {activeTab === 'home' && <HomeSection setActiveTab={handleSetActiveTab} />}
+          {activeTab === 'users' && <UsersSection showNewUserForm={showNewUserForm} setShowNewUserForm={setShowNewUserForm} />}
           {activeTab === 'visits' && <VisitsSection />}
           {activeTab === 'orders' && <OrdersSection />}
           {activeTab === 'modules' && <ModulesSection />}

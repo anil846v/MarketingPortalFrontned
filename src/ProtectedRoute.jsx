@@ -1,51 +1,44 @@
-import { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-
-const API_BASE_URL = 'http://localhost:9090';
+import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { authFetch } from "./utils/authFetch";
+import { API_BASE_URL } from "./config";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [userRole, setUserRole] = useState(null);
-  const location = useLocation();
+  const [allowed, setAllowed] = useState(null);
 
   useEffect(() => {
-    checkAuth();
-  }, []); // Only check on mount, not on every route change
+    let intervalId;
 
-  const checkAuth = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/validate`, {
-        method: 'POST',
-        credentials: 'include'
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.valid) {
-          setIsAuthenticated(true);
-          setUserRole(data.role);
-        } else {
-          setIsAuthenticated(false);
+    const checkAuth = async () => {
+      try {
+        const res = await authFetch(`${API_BASE_URL}/auth/validate`, { method: "POST" });
+        const data = await res.json();
+
+        if (requiredRole && data.role !== requiredRole) {
+          setAllowed(false);
+          return;
         }
-      } else {
-        setIsAuthenticated(false);
+
+        setAllowed(true);
+      } catch {
+        setAllowed(false);
       }
-    } catch (error) {
-      setIsAuthenticated(false);
-    }
-  };
+    };
 
-  if (isAuthenticated === null) {
-    return <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>Loading...</div>;
-  }
+    const handleSessionExpired = () => setAllowed(false);
+    window.addEventListener("session-expired", handleSessionExpired);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+    checkAuth();
+    intervalId = setInterval(checkAuth, 2 * 60 * 1000);
 
-  if (requiredRole && userRole !== requiredRole) {
-    return <Navigate to="/login" replace />;
-  }
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("session-expired", handleSessionExpired);
+    };
+  }, [requiredRole]);
+
+  if (allowed === null) return <div>Checking session...</div>;
+  if (!allowed) return <Navigate to="/login?session=expired" replace />;
 
   return children;
 };

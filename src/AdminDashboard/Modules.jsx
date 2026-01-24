@@ -90,9 +90,9 @@ const ModulesSection = () => {
               </tr>
             </thead>
             <tbody>
-              {modules.map(module => (
+              {modules.map((module,index) => (
                 <tr key={module.id} style={{borderBottom: '1px solid #f0f0f0', transition: 'background 0.2s'}} onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'} onMouseLeave={(e) => e.currentTarget.style.background = 'white'}>
-                  <td style={{padding: '16px', fontSize: '14px', color: '#333'}}>{module.id}</td>
+                  <td style={{padding: '16px', fontSize: '14px', color: '#333'}}>{index + 1}</td>
                   <td style={{padding: '16px', fontSize: '14px', fontWeight: '600', color: '#000'}}>{module.moduleName}</td>
                   <td style={{padding: '16px', fontSize: '14px', color: '#333', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
                     <span title={module.description}>{module.description || 'No description'}</span>

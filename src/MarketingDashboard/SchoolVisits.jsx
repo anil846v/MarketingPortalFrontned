@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom'; // For URL filtering
+
 import SchoolVisitWizard from './SchoolVisitWizard';
 import { showToast } from '../components/ToastContainer';
-import { confirmAction } from '../components/ConfirmationProvider';
 
 const API_BASE_URL = 'http://localhost:9090/api/marketing';
 
-const SchoolVisits = () => {
+const SchoolVisits = ({ statusFilter: propStatusFilter, setStatusFilter: setPropStatusFilter, showNewVisitForm, setShowNewVisitForm }) => {
+    const [searchParams, setSearchParams] = useSearchParams();
+
   const [visits, setVisits] = useState([]);
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(showNewVisitForm || false);
   const [editingVisit, setEditingVisit] = useState(null);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [acceptingVisitId, setAcceptingVisitId] = useState(null);
@@ -17,21 +20,50 @@ const SchoolVisits = () => {
   const [rejectingVisitId, setRejectingVisitId] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [acceptForm, setAcceptForm] = useState({ initialPayment: '', paymentTerms: '', costPerMember: '' });
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState(() => {
+    // Initialize with prop if provided and valid, otherwise default to 'ALL'
+    if (propStatusFilter && ['ALL', 'PENDING', 'ACCEPTED', 'REJECTED'].includes(propStatusFilter)) {
+      return propStatusFilter;
+    }
+    const urlFilter = searchParams.get('status');
+    if (urlFilter && ['ALL', 'PENDING', 'ACCEPTED', 'REJECTED'].includes(urlFilter)) {
+      return urlFilter;
+    }
+    return 'ALL';
+  });
   const [visitForm, setVisitForm] = useState({
     schoolName: '', visitedDate: '', marketingExecutiveName: '', locationCity: '',
     contactPersonName: '', designation: '', contactNo: '', emailId: '',
     schoolStrenght: '', boards: '', currentSystem: '', noOfUsers: '',
     dataMigrationRequired: '', customFeaturesRequired: '', rfidIntegration: '',
-    idCards: '', paymentGatewayPreference: '', budgetRange: '', expected_goLive_date: '',
+    idCards: '', paymentGatewayPreference: '', budgetRange: '', expectedGoLiveDate: '',
     decisionMakerName: '', decisionTimeline: '', demoRequired: '', demoDate: '',
     proposalSent: '', proposalDate: '', selectedModules: []
   });
+
+  // Update filter when prop changes
+  useEffect(() => {
+    if (propStatusFilter && ['ALL', 'PENDING', 'ACCEPTED', 'REJECTED'].includes(propStatusFilter)) {
+      setStatusFilter(propStatusFilter);
+    }
+  }, [propStatusFilter]);
+
+  // Sync showNewVisitForm prop with local state
+  useEffect(() => {
+    if (showNewVisitForm) {
+      setShowForm(true);
+      // Reset the parent state after using it
+      if (setShowNewVisitForm) {
+        setShowNewVisitForm(false);
+      }
+    }
+  }, [showNewVisitForm, setShowNewVisitForm]);
 
   useEffect(() => {
     fetchVisits();
     fetchModules();
   }, []);
+  
 
   const fetchVisits = async () => {
     try {
@@ -39,7 +71,7 @@ const SchoolVisits = () => {
       const data = await response.json();
       if (response.ok) setVisits(data || []);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching visits:', error);
     }
   };
 
@@ -49,28 +81,42 @@ const SchoolVisits = () => {
       const data = await response.json();
       if (response.ok) setModules(data || []);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching modules:', error);
     }
+  };
+
+  // Helper to convert empty strings to null for all fields
+  const cleanPayload = (obj) => {
+    const cleaned = {};
+    Object.entries(obj).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        cleaned[key] = value;
+      } else if (value === '') {
+        cleaned[key] = null;
+      } else {
+        cleaned[key] = value;
+      }
+    });
+    return cleaned;
   };
 
   const handleSubmit = async (formData) => {
     setLoading(true);
     try {
-      const payload = {
+      const payload = cleanPayload({
         ...formData,
         schoolStrenght: formData.schoolStrenght ? parseInt(formData.schoolStrenght) : null,
         noOfUsers: formData.noOfUsers ? parseInt(formData.noOfUsers) : null,
-        budgetRange: formData.budgetRange || null,
         selectedModules: formData.selectedModules.map(m => ({ moduleId: m.moduleId, isSelected: 'Yes', remarks: m.remarks || '' }))
-      };
-      
+      });
+
       // Remove fields that cannot be updated
       if (editingVisit) {
         delete payload.schoolName;
         delete payload.visitedDate;
         delete payload.locationCity;
       }
-      
+
       const url = editingVisit ? `${API_BASE_URL}/school-visit/${editingVisit.id}` : `${API_BASE_URL}/school-visit`;
       const response = await fetch(url, {
         method: editingVisit ? 'PUT' : 'POST',
@@ -78,7 +124,7 @@ const SchoolVisits = () => {
         credentials: 'include',
         body: JSON.stringify(payload)
       });
-      
+
       if (response.ok) {
         showToast(editingVisit ? 'Visit updated successfully' : 'Visit submitted successfully', 'success');
         setShowForm(false);
@@ -90,7 +136,7 @@ const SchoolVisits = () => {
         showToast('Error: ' + (error.error || 'Failed to save visit'), 'error');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error submitting visit:', error);
       showToast('Failed to save visit', 'error');
     } finally {
       setLoading(false);
@@ -103,7 +149,7 @@ const SchoolVisits = () => {
       contactPersonName: '', designation: '', contactNo: '', emailId: '',
       schoolStrenght: '', boards: '', currentSystem: '', noOfUsers: '',
       dataMigrationRequired: '', customFeaturesRequired: '', rfidIntegration: '',
-      idCards: '', paymentGatewayPreference: '', budgetRange: '', expected_goLive_date: '',
+      idCards: '', paymentGatewayPreference: '', budgetRange: '', expectedGoLiveDate: '',
       decisionMakerName: '', decisionTimeline: '', demoRequired: '', demoDate: '',
       proposalSent: '', proposalDate: '', selectedModules: []
     });
@@ -112,19 +158,32 @@ const SchoolVisits = () => {
   const handleEdit = (visit) => {
     setEditingVisit(visit);
     setVisitForm({
-      schoolName: visit.schoolName || '', visitedDate: visit.visitedDate || '',
-      marketingExecutiveName: visit.marketingExecutiveName || '', locationCity: visit.locationCity || '',
-      contactPersonName: visit.contactPersonName || '', designation: visit.designation || '',
-      contactNo: visit.contactNo || '', emailId: visit.emailId || '',
-      schoolStrenght: visit.schoolStrenght || '', boards: visit.boards || '',
-      currentSystem: visit.CurrentSystem || '', noOfUsers: visit['No Of Users '] || '',
-      dataMigrationRequired: visit['Data Migration Required'] || '', customFeaturesRequired: visit['Custom Features Required'] || '',
-      rfidIntegration: visit['RFID Integration'] || '', idCards: visit['Id Cards'] || '',
-      paymentGatewayPreference: visit['Payment GateWay Preference'] || '', budgetRange: visit['Budget Range'] || '',
-      expected_goLive_date: visit.expectedGoLiveDate || '', decisionMakerName: visit.decisionMakerName || '',
-      decisionTimeline: visit.decisionTimeline || '', demoRequired: visit['Demo Required'] || '',
-      demoDate: visit['Demo Date'] || '', proposalSent: visit['Proposal Sent'] || '',
-      proposalDate: visit['Proposal date'] || '', selectedModules: visit.selectedModules?.map(m => m.moduleId) || []
+      schoolName: visit.schoolName || '',
+      visitedDate: visit.visitedDate || null,
+      marketingExecutiveName: visit.marketingExecutiveName || '',
+      locationCity: visit.locationCity || '',
+      contactPersonName: visit.contactPersonName || '',
+      designation: visit.designation || '',
+      contactNo: visit.contactNo || '',
+      emailId: visit.emailId || '',
+      schoolStrenght: visit.schoolStrenght || '',
+      boards: visit.boards || '',
+      currentSystem: visit.CurrentSystem || '',
+      noOfUsers: visit['No Of Users '] || '',
+      dataMigrationRequired: visit['Data Migration Required'] || '',
+      customFeaturesRequired: visit['Custom Features Required'] || '',
+      rfidIntegration: visit['RFID Integration'] || '',
+      idCards: visit['Id Cards'] || '',
+      paymentGatewayPreference: visit['Payment GateWay Preference'] || '',
+      budgetRange: visit['Budget Range'] || '',
+      expectedGoLiveDate: visit.expectedGoLiveDate || null,
+      decisionMakerName: visit.decisionMakerName || '',
+      decisionTimeline: visit.decisionTimeline || '',
+      demoRequired: visit['Demo Required'] || '',
+      demoDate: visit['Demo Date'] || null,
+      proposalSent: visit['Proposal Sent'] || '',
+      proposalDate: visit['Proposal date'] || null,
+      selectedModules: visit.selectedModules?.map(m => m.moduleId) || []
     });
     setShowForm(true);
     setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
@@ -136,7 +195,6 @@ const SchoolVisits = () => {
       setShowAcceptModal(true);
       return;
     }
-    
     if (newStatus === 'REJECTED') {
       setRejectingVisitId(visitId);
       setShowRejectModal(true);
@@ -150,21 +208,15 @@ const SchoolVisits = () => {
       showToast('Rejection reason is required', 'warning');
       return;
     }
-    
     setLoading(true);
     try {
-      const payload = { 
-        status: 'REJECTED',
-        rejectionReason: rejectionReason.trim()
-      };
-      
+      const payload = { status: 'REJECTED', rejectionReason: rejectionReason.trim() };
       const response = await fetch(`${API_BASE_URL}/change-visit-status/${rejectingVisitId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(payload)
       });
-      
       if (response.ok) {
         showToast('Visit rejected successfully', 'success');
         setShowRejectModal(false);
@@ -220,6 +272,13 @@ const SchoolVisits = () => {
     }
   };
 
+  // ... [Rest of your JSX for rendering form, modals, and visit cards remains unchanged]
+  // For brevity, I am not repeating the long JSX here, but you can keep the same JSX you already have.
+  // The main changes are in handleSubmit, handleEdit, and cleanPayload function to handle empty dates.
+
+
+
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -263,9 +322,22 @@ const SchoolVisits = () => {
             <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Accept Order</h3>
             <form onSubmit={handleAcceptOrder}>
               <div style={{ display: 'grid', gap: '15px' }}>
-                <input type="number" placeholder="Initial Payment" value={acceptForm.initialPayment} onChange={(e) => setAcceptForm({ ...acceptForm, initialPayment: e.target.value })} style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                <input type="text" placeholder="Payment Terms" value={acceptForm.paymentTerms} onChange={(e) => setAcceptForm({ ...acceptForm, paymentTerms: e.target.value })} style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
-                <input type="number" placeholder="Cost Per Member" value={acceptForm.costPerMember} onChange={(e) => setAcceptForm({ ...acceptForm, costPerMember: e.target.value })} style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '6px', fontSize: '14px' }} />
+                <input type="number" placeholder="Initial Payment" value={acceptForm.initialPayment} onChange={(e) => setAcceptForm({ ...acceptForm, initialPayment: e.target.value })} style={{ backgroundColor: '#fafafa', color :'black',padding: '12px', border: '2px solid #1538ab', borderRadius: '6px', fontSize: '14px' }} />
+<textarea
+  placeholder="Payment Terms"
+  value={acceptForm.paymentTerms}
+  onChange={(e) =>
+    setAcceptForm({ ...acceptForm, paymentTerms: e.target.value })
+  }
+  style={{backgroundColor: '#fafafa', color :'black',padding: '12px', border: '2px solid #1538ab',
+   
+    borderRadius: '6px',
+    fontSize: '14px',
+    minHeight: '80px', // sets initial height
+    resize: 'vertical', // allows user to resize vertically
+  }}
+/>
+                <input type="number" placeholder="Cost Per Member" value={acceptForm.costPerMember} onChange={(e) => setAcceptForm({ ...acceptForm, costPerMember: e.target.value })} style={{backgroundColor: '#fafafa', color :'black',padding: '12px', border: '2px solid #1538ab',  borderRadius: '6px', fontSize: '14px' }} />
               </div>
               <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
                 <button type="submit" disabled={loading} style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>
@@ -292,11 +364,11 @@ const SchoolVisits = () => {
                   onChange={(e) => setRejectionReason(e.target.value)}
                   placeholder="Please provide a reason for rejecting this visit..."
                   required
-                  style={{ 
+                  style={{ backgroundColor: '#fafafa', color :'black',
                     width: '100%', 
                     minHeight: '100px', 
                     padding: '12px', 
-                    border: '1px solid #ddd', 
+                    border: '1px solid #8d0808', 
                     borderRadius: '6px', 
                     fontSize: '14px',
                     resize: 'vertical',
@@ -331,8 +403,8 @@ const SchoolVisits = () => {
                 cursor: 'pointer',
                 fontSize: '13px',
                 fontWeight: '500',
-                transition: 'all 0.2s',
-                borderRadius: '20px'
+                transition: 'all 0.1s',
+                borderRadius: '0px'
               }}
             >
               {status === 'ALL' ? `All (${visits.length})` : `${status.charAt(0) + status.slice(1).toLowerCase()} (${visits.filter(v => v.status === status).length})`}
@@ -351,18 +423,19 @@ const SchoolVisits = () => {
         />
       )}
 
-      <div style={{ display: 'grid', gap: '16px' }}>
+{/* style={{ display: 'grid', gap: '16px' }} */}
+      <div className='schoolsVisitedCard'>
         {visits.filter(v => statusFilter === 'ALL' || v.status === statusFilter).map(visit => (
-          <div key={visit.id} style={{ border: '1px solid #e5e5e5', borderRadius: '12px', padding: '20px', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', transition: 'transform 0.2s, box-shadow 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)'; }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+          <div key={visit.id} className='schoolVisitedSingleCard' onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)'; }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start',flexWrap:'wrap' }}>
               <div style={{ flex: 1 }}>
-                <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: '600', color: '#000' }}>{visit.schoolName}</h3>
+                <h3 style={{ margin: '0 0 12px 0', fontSize: '20px', fontWeight: '600', color: '#d211cf' }}>{visit.schoolName}</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', color: '#666', fontSize: '14px' }}>
                   <p style={{ margin: '4px 0' }}><strong>Location:</strong> {visit.locationCity}</p>
-                  <p style={{ margin: '4px 0' }}><strong>Contact:</strong> {visit.contactPersonName}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Contact Person:</strong> {visit.contactPersonName}</p>
                   <p style={{ margin: '4px 0' }}><strong>Phone:</strong> {visit.contactNo}</p>
                   <p style={{ margin: '4px 0' }}><strong>Visit Date:</strong> {visit.visitedDate}</p>
-                  <p style={{ margin: '4px 0' }}><strong>Executive:</strong> {visit.marketingExecutiveName}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Decision Timeline:</strong> {visit.decisionTimeline}</p>
                 </div>
                 {visit.selectedModules && visit.selectedModules.length > 0 && (
                   <div style={{ marginTop: '12px' }}>
@@ -370,7 +443,7 @@ const SchoolVisits = () => {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                       {visit.selectedModules.map(module => {
                         const mod = modules.find(m => m.id === module.moduleId);
-                        return mod ? <span key={module.moduleId} style={{ background: '#e8eaf6', color: '#667eea', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '500' }}>{mod.moduleName}</span> : null;
+                        return mod ? <span key={module.moduleId} style={{ background: '#dcdff1', color: '#132c9c', padding: '4px 10px', borderRadius: '0px', fontSize: '12px', fontWeight: '500' }}>{mod.moduleName}</span> : null;
                       })}
                     </div>
                   </div>

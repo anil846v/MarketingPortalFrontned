@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect ,useCallback } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 
 const API_BASE_URL = 'http://localhost:9090/api/marketing';
 
-const Home = ({ setActiveTab }) => {
+const Home = ({ setActiveTab, setStatusFilter }) => {
+  const navigate = useNavigate();
+
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -15,7 +18,7 @@ const Home = ({ setActiveTab }) => {
     fetchStats();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/school-visits`, {
         credentials: 'include'
@@ -35,10 +38,22 @@ const Home = ({ setActiveTab }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+   useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
-  const StatCard = ({ icon, label, value, gradient }) => (
-    <div style={{
+
+  const StatCard = ({ icon, label, value, gradient, statusFilter }) => (
+    <div 
+     className="stat-card"
+      onClick={() => {
+        if (statusFilter) {
+          // Pass the filter value directly to setActiveTab handler
+          setActiveTab('visits', statusFilter);
+        }
+      }}
+      style={{
       background: 'white',
       padding: '24px',
       borderRadius: '12px',
@@ -48,15 +63,19 @@ const Home = ({ setActiveTab }) => {
       gap: '20px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
       transition: 'transform 0.2s, box-shadow 0.2s',
-      cursor: 'pointer'
+        cursor: statusFilter ? 'pointer' : 'default'
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-4px)';
-      e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
+      if (statusFilter) {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
+      }
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+      if (statusFilter) {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+      }
     }}
     >
       <div style={{
@@ -93,14 +112,14 @@ const Home = ({ setActiveTab }) => {
   );
 
   return (
-    <div>
+    <div className="home-container">
       <div style={{ marginBottom: '24px' }}>
         <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#000', marginBottom: '8px' }}>
           Marketing Dashboard
         </h2>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}>
         <StatCard
           icon={
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -109,8 +128,11 @@ const Home = ({ setActiveTab }) => {
             </svg>
           }
           label="Total Visits"
-          value={stats.total}
+          value={stats.total }
+          
           gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
+            statusFilter="ALL" // Pass status for filtering
+
         />
         <StatCard
           icon={
@@ -122,6 +144,8 @@ const Home = ({ setActiveTab }) => {
           label="Pending"
           value={stats.pending}
           gradient="linear-gradient(135deg, #ffc107 0%, #ff9800 100%)"
+                    statusFilter="PENDING"
+
         />
         <StatCard
           icon={
@@ -133,6 +157,8 @@ const Home = ({ setActiveTab }) => {
           label="Accepted"
           value={stats.accepted}
           gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+                    statusFilter="ACCEPTED"
+
         />
         <StatCard
           icon={
@@ -145,14 +171,17 @@ const Home = ({ setActiveTab }) => {
           label="Rejected"
           value={stats.rejected}
           gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+                    statusFilter="REJECTED"
+
         />
       </div>
 
-      <div style={{ background: 'white', padding: '24px', borderRadius: '12px', border: '1px solid #e5e5e5' }}>
+      <div className="quick-actions" style={{ background: 'white', padding: '24px', borderRadius: '12px', border: '1px solid #e5e5e5' }}>
         <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#000', marginBottom: '16px' }}>Quick Actions</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+        <div className="action-buttons" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
           <button 
-            onClick={() => setActiveTab('visits')}
+            className="action-btn"
+            onClick={() => setActiveTab('visits', null, true)}
             style={{
               padding: '16px 24px',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
