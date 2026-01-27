@@ -12,6 +12,7 @@ import ModulesSection from './AdminDashboard/Modules';
 import AnnouncementsSection from './AdminDashboard/Announcemnts';
 import MessagesSection from './AdminDashboard/Messages';
 import ProfileSection from './AdminDashboard/Profile';
+import MobileBottomNav from './AdminDashboard/MobileBottomNav';
 import ToastContainer from './components/ToastContainer';
 import ConfirmationProvider from './components/ConfirmationProvider';
 import { authFetch } from './utils/authFetch';
@@ -76,7 +77,7 @@ const AdminDashboard = () => {
       'Cancel',
       'warning'
     );
-    
+
     if (confirmed) {
       try {
         await authFetch(`${API_BASE_URL}/auth/logout`, {
@@ -91,26 +92,25 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-layout">
-      <SideMenu 
+      <SideMenu
         title="Admin"
         menuItems={adminMenuItems}
-        activeTab={activeTab} 
-        setActiveTab={handleSetActiveTab} 
-        sidebarOpen={sidebarOpen} 
-        setSidebarOpen={setSidebarOpen} 
+        activeTab={activeTab}
+        setActiveTab={handleSetActiveTab}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
       />
 
       <div className="main-content">
         <header className="top-header">
-         <button 
-            className="menu-toggle" 
+          <button
+            className="menu-toggle"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            style={{ display: 'none' }}
             id="mobile-menu-toggle"
           >
             ☰
           </button>
-          <h1>GMMC SchoolsVisited Portal</h1>
+          <h1>GMMC Marketing Portal</h1>
           <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </header>
 
@@ -125,7 +125,17 @@ const AdminDashboard = () => {
           {activeTab === 'profile' && <ProfileSection />}
         </main>
       </div>
-      
+
+      <MobileBottomNav
+        activeTab={activeTab}
+        setActiveTab={handleSetActiveTab}
+        setSidebarOpen={setSidebarOpen}
+        sidebarOpen={sidebarOpen}
+      />
+
+      {/* Overlay for mobile sidebar */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+
       <ToastContainer />
       <ConfirmationProvider />
     </div>

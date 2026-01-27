@@ -28,14 +28,14 @@ const AnnouncementsSection = () => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
+
       const response = await fetch(`${API_BASE_URL}/admin/announcements?page=${page}&size=20`, {
         credentials: 'include',
         signal: controller.signal
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!response.ok) throw new Error('Failed to load announcements');
       const data = await response.json();
       setAnnouncements(data.content || []);
@@ -59,15 +59,15 @@ const AnnouncementsSection = () => {
       'Cancel',
       'danger'
     );
-    
+
     if (!confirmed) return;
-    
+
     // Validate id to prevent SSRF
     if (!id || typeof id !== 'number' || id <= 0) {
       showToast('Invalid announcement ID', 'error');
       return;
     }
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/admin/announcements/${encodeURIComponent(id)}`, {
         method: 'DELETE',
@@ -87,17 +87,17 @@ const AnnouncementsSection = () => {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2 style={{fontSize: '24px', fontWeight: '600'}}>Announcements ({announcements.length})</h2>
+        <h2 style={{ fontSize: '24px', fontWeight: '600' }}>Announcements ({announcements.length})</h2>
         {!showCreateForm && (
-          <button onClick={() => setShowCreateForm(true)} style={{padding: '10px 20px', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px'}}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <button onClick={() => setShowCreateForm(true)} style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
             Create Announcement
           </button>
         )}
       </div>
 
       {showCreateForm && (
-        <CreateAnnouncementForm 
+        <CreateAnnouncementForm
           onSuccess={() => {
             setShowCreateForm(false);
             fetchAnnouncements();
@@ -134,45 +134,47 @@ const AnnouncementsSection = () => {
             </div>
           ) : announcements.length > 0 ? (
             <>
-              <div style={{background: 'white', borderRadius: '12px', border: '1px solid #e5e5e5', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'}}>
-                <table style={{width: '100%', borderCollapse: 'collapse'}}>
-                  <thead>
-                    <tr style={{background: '#f8f9fa', borderBottom: '2px solid #e5e5e5'}}>
-                      <th style={{padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '80px'}}>ID</th>
-                      <th style={{padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '250px'}}>Title</th>
-                      <th style={{padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666'}}>Message</th>
-                      <th style={{padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '150px'}}>Created At</th>
-                      <th style={{padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '100px'}}>Reads</th>
-                      <th style={{padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '100px'}}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {announcements.map((announcement, index) => (
-                      <tr key={announcement.id} style={{borderBottom: '1px solid #f0f0f0', transition: 'background 0.2s'}} onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'} onMouseLeave={(e) => e.currentTarget.style.background = 'white'}>
-                        <td style={{padding: '16px', fontSize: '14px', color: '#333'}}>{index + 1}</td>
-                        <td style={{padding: '16px', fontSize: '14px', fontWeight: '600', color: '#000'}}>{announcement.title}</td>
-                        <td style={{padding: '16px', fontSize: '14px', color: '#333', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                          <span title={announcement.message}>{announcement.message}</span>
-                        </td>
-                        <td style={{padding: '16px', fontSize: '12px', color: '#666'}}>
-                          {new Date(announcement.createdAt).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}
-                        </td>
-                        <td style={{padding: '16px'}}>
-                          <span style={{display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', background: '#f0f0f0', borderRadius: '12px', fontSize: '12px', fontWeight: '600', color: '#333'}}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            {announcement.readCount || 0}
-                          </span>
-                        </td>
-                        <td style={{padding: '16px'}}>
-                          <button onClick={() => handleDelete(announcement.id)} style={{background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)', color: 'white', padding: '7px 14px', fontSize: '12px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px'}}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                            Delete
-                          </button>
-                        </td>
+              <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e5e5', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                <div className="table-container">
+                  <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #e5e5e5' }}>
+                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '80px' }}>ID</th>
+                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '250px' }}>Title</th>
+                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Message</th>
+                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '150px' }}>Created At</th>
+                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '100px' }}>Reads</th>
+                        <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '100px' }}>Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {announcements.map((announcement, index) => (
+                        <tr key={announcement.id} style={{ borderBottom: '1px solid #f0f0f0', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'} onMouseLeave={(e) => e.currentTarget.style.background = 'white'}>
+                          <td data-label="ID" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{index + 1}</td>
+                          <td data-label="Title" style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#000' }}>{announcement.title}</td>
+                          <td data-label="Message" style={{ padding: '16px', fontSize: '14px', color: '#333', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <span title={announcement.message}>{announcement.message}</span>
+                          </td>
+                          <td data-label="Created At" style={{ padding: '16px', fontSize: '12px', color: '#666' }}>
+                            {new Date(announcement.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                          </td>
+                          <td data-label="Reads" style={{ padding: '16px' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', background: '#f0f0f0', borderRadius: '12px', fontSize: '12px', fontWeight: '600', color: '#333' }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                              {announcement.readCount || 0}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px' }}>
+                            <button onClick={() => handleDelete(announcement.id)} style={{ background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)', color: 'white', padding: '7px 14px', fontSize: '12px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {totalPages > 1 && (
@@ -183,8 +185,8 @@ const AnnouncementsSection = () => {
                   gap: '12px',
                   marginTop: '20px'
                 }}>
-                  <button 
-                    onClick={() => setPage(p => Math.max(0, p - 1))} 
+                  <button
+                    onClick={() => setPage(p => Math.max(0, p - 1))}
                     disabled={page === 0}
                     style={{
                       padding: '8px 16px',
@@ -201,8 +203,8 @@ const AnnouncementsSection = () => {
                   <span style={{ fontSize: '13px', color: '#666', fontWeight: '500' }}>
                     Page {page + 1} of {totalPages}
                   </span>
-                  <button 
-                    onClick={() => setPage(p => p + 1)} 
+                  <button
+                    onClick={() => setPage(p => p + 1)}
                     disabled={page >= totalPages - 1}
                     style={{
                       padding: '8px 16px',
@@ -271,26 +273,26 @@ const CreateAnnouncementForm = ({ onSuccess, onCancel }) => {
         <div className="form-grid">
           <div className="form-field full-width">
             <label>Title *</label>
-            <input 
-              type="text" 
-              placeholder="Enter announcement title (3-200 characters)" 
-              value={title} 
-              onChange={(e) => setTitle(e.target.value)} 
-              required 
+            <input
+              type="text"
+              placeholder="Enter announcement title (3-200 characters)"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
               minLength={3}
               maxLength={200}
             />
           </div>
           <div className="form-field full-width">
             <label>Message *</label>
-            <textarea 
-              placeholder="Enter announcement message (10-5000 characters)" 
-              value={message} 
-              onChange={(e) => setMessage(e.target.value)} 
-              required 
+            <textarea
+              placeholder="Enter announcement message (10-5000 characters)"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
               minLength={10}
               maxLength={5000}
-              style={{ minHeight: '120px' }} 
+              style={{ minHeight: '120px' }}
             />
           </div>
         </div>

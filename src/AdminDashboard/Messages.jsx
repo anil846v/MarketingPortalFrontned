@@ -81,7 +81,7 @@ const MessagesSection = ({ setSidebarOpen }) => {
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
-    
+
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/admin/messages/send`, {
@@ -102,10 +102,10 @@ const MessagesSection = ({ setSidebarOpen }) => {
   };
 
   const handleDeleteMessage = async (messageId, deleteType) => {
-    const confirmMsg = deleteType === 'FOR_EVERYONE' 
-      ? 'Delete this message for everyone? This cannot be undone.' 
+    const confirmMsg = deleteType === 'FOR_EVERYONE'
+      ? 'Delete this message for everyone? This cannot be undone.'
       : 'Delete this message for you only?';
-    
+
     const confirmed = await confirmAction(
       'Delete Message',
       confirmMsg,
@@ -113,9 +113,9 @@ const MessagesSection = ({ setSidebarOpen }) => {
       'Cancel',
       'danger'
     );
-    
+
     if (!confirmed) return;
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/admin/messages/${messageId}?deleteType=${deleteType}`, {
         method: 'DELETE',
@@ -135,7 +135,7 @@ const MessagesSection = ({ setSidebarOpen }) => {
   const selectedUser = users.find(u => u.userId === selectedUserId);
 
   return (
-    <div className="messages-container">
+    <div className={`messages-container ${selectedUserId ? 'chat-active' : ''}`}>
       {/* Users Sidebar */}
       <div className="users-sidebar">
         <div className="sidebar-header-msg">
@@ -146,7 +146,7 @@ const MessagesSection = ({ setSidebarOpen }) => {
             </span>
           )}
         </div>
-        
+
         <div className="users-list">
           {users.map(user => (
             <div
@@ -275,17 +275,17 @@ const MessagesSection = ({ setSidebarOpen }) => {
                         })}
                         {isSent && msg.isRead && (
                           <svg width="16" height="10" viewBox="0 0 16 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="1,5 4,8 8,2"/>
-                            <polyline points="5,5 8,8 12,2"/>
+                            <polyline points="1,5 4,8 8,2" />
+                            <polyline points="5,5 8,8 12,2" />
                           </svg>
                         )}
                         {isSent && !msg.isRead && (
                           <svg width="12" height="10" viewBox="0 0 12 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="1,5 4,8 11,1"/>
+                            <polyline points="1,5 4,8 11,1" />
                           </svg>
                         )}
                       </div>
-                      
+
                       <button
                         onClick={() => setActiveMenu(activeMenu === msg.id ? null : msg.id)}
                         style={{
@@ -304,7 +304,7 @@ const MessagesSection = ({ setSidebarOpen }) => {
                         ⋮
                       </button>
                     </div>
-                    
+
                     {activeMenu === msg.id && (
                       <div
                         style={{
@@ -417,8 +417,8 @@ const MessagesSection = ({ setSidebarOpen }) => {
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="22" y1="2" x2="11" y2="13"/>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
                 </svg>
                 Send
               </button>
@@ -436,7 +436,7 @@ const MessagesSection = ({ setSidebarOpen }) => {
           }}>
             <div style={{ textAlign: 'center' }}>
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="1.5" style={{ marginBottom: '16px' }}>
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
               <div>Select a user to start messaging</div>
             </div>

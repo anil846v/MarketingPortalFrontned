@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { showToast } from '../components/ToastContainer';
 import { API_BASE_URL } from '../config';
 import { sanitizeInput } from '../utils/validation';
@@ -42,19 +43,19 @@ const ProfileSection = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate username
     if (formData.username && formData.username.length < 3) {
       showToast('Username must be at least 3 characters', 'error');
       return;
     }
-    
+
     // Validate password if provided
     if (formData.password && formData.password.length < 6) {
       showToast('Password must be at least 6 characters', 'error');
       return;
     }
-    
+
     try {
       const payload = {};
       if (formData.username !== profile.username) {
@@ -66,16 +67,16 @@ const ProfileSection = () => {
       if (formData.gender !== profile.gender) {
         payload.gender = formData.gender;
       }
-      
+
       const response = await fetch(`${API_BASE_URL}/admin/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(payload)
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         showToast('Profile updated successfully', 'success');
         setEditing(false);
@@ -88,15 +89,15 @@ const ProfileSection = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingSpinner message="Loading profile..." />;
   if (!profile) return <div>Failed to load profile</div>;
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
         </svg>
         <h2>Admin Profile</h2>
       </div>
@@ -160,7 +161,7 @@ const ProfileSection = () => {
                 </div>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => setEditing(true)}
               style={{
                 padding: '10px 20px',
@@ -177,8 +178,8 @@ const ProfileSection = () => {
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
               </svg>
               Edit Profile
             </button>
@@ -193,7 +194,7 @@ const ProfileSection = () => {
                 <input
                   type="text"
                   value={formData.username}
-                  onChange={(e) => setFormData({...formData, username: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -210,7 +211,7 @@ const ProfileSection = () => {
                 <input
                   type="password"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Leave empty to keep current password"
                   style={{
                     width: '100%',
@@ -227,7 +228,7 @@ const ProfileSection = () => {
                 </label>
                 <select
                   value={formData.gender}
-                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -243,7 +244,7 @@ const ProfileSection = () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button 
+              <button
                 type="submit"
                 style={{
                   padding: '10px 20px',
@@ -258,7 +259,7 @@ const ProfileSection = () => {
               >
                 Save Changes
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => {
                   setEditing(false);

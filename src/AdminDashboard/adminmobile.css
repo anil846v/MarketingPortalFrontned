@@ -1,315 +1,47 @@
+/* Admin Mobile CSS - Supplementary Styles */
+/* Note: Main responsive styles are now in AdminDashboard.css under .responsive-table and global media queries */
 
 @media (max-width: 768px) {
-  
-  table {
-    width: 100% !important;
-    border: none !important;
-    background: transparent !important;
-    display: block !important;
-    border-spacing: 0 !important;
-    border-collapse: collapse !important;
-    margin-top: 12px;
-  }
-  
-  table thead {
-    display: none !important;
-  }
-  
-  table tr {
-    display: flex !important;
-    flex-direction: column !important;
-    background: white !important;
-    border: 1px solid #e5e5e5 !important;
-    border-radius: 12px !important;
-    padding: 16px !important;
-    margin-bottom: 12px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-    gap: 10px !important;
-  }
-  
-  table td {
-    padding: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    border: none !important;
-    font-size: 13px !important;
-    color: #000 !important;
-    gap: 4px !important;
-    word-break: break-word !important;
-  }
-  
-  table td::before {
-    content: attr(data-label);
-    font-size: 11px;
+
+  /* Status Colors */
+  .status {
     font-weight: 600;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  table input[type="text"],
-  table input[type="email"],
-  table input[type="number"],
-  table input[type="date"],
-  table select {
-    width: 100% !important;
-    padding: 8px !important;
-    border: 1px solid #e5e5e5 !important;
-    border-radius: 6px !important;
-    font-size: 12px !important;
-    box-sizing: border-box !important;
-  }
-  
-  table button {
-    padding: 8px 12px !important;
-    font-size: 11px !important;
-    border: none !important;
-    border-radius: 6px !important;
-    cursor: pointer !important;
-    background: #667eea !important;
-    color: white !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 4px !important;
-    margin: 4px 4px 4px 0 !important;
-    transition: all 0.2s !important;
-  }
-  /* 🔥 MOBILE TABLE TO CARD LAYOUT */
-@media (max-width: 768px) {
-
-  .responsive-table thead {
-    display: none;
+    border-radius: 6px;
   }
 
-  .responsive-table,
-  .responsive-table tbody,
-  .responsive-table tr,
-  .responsive-table td {
-    display: block;
-    width: 100%;
+  .status-select[value="ACCEPTED"] {
+    color: #2e7d32;
   }
 
-  .responsive-table tr {
-    background: #fff;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    padding: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border: 1px solid #eee;
+  .status-select[value="REJECTED"] {
+    color: #c62828;
   }
 
-  .responsive-table td {
-    text-align: right;
-    padding: 10px 12px;
-    position: relative;
-    border: none !important;
-    font-size: 14px;
+  .status-select[value="PENDING"] {
+    color: #f9a825;
   }
 
-  /* Left label (column name) */
-  .responsive-table td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 12px;
-    top: 10px;
+  .status-select[value="Approved"] {
+    color: #2e7d32;
+  }
+
+  .status-select[value="Rejected"] {
+    color: #c62828;
+  }
+
+  .status-select[value="Pending"] {
+    color: #f9a825;
+  }
+
+  /* Ensure status select has proper background in tables */
+  .status-select {
     font-weight: 600;
-    color: #666;
-    text-align: left;
-  }
-
-  /* Button full width */
-  .responsive-table td:last-child {
-    text-align: center;
-    padding-top: 12px;
-  }
-
-  .responsive-table button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-@media (max-width: 768px) {
-  table td select {
-    width: 100% !important;
-    min-height: 40px;
-    font-size: 14px !important;
-    padding: 8px !important;
-  }
-}
-.status {
-  font-weight: 600;
-  border-radius: 6px;
-}
-
-.status-select[value="ACCEPTED"] { color: #2e7d32; }
-.status-select[value="REJECTED"] { color: #c62828; }
-.status-select[value="PENDING"]  { color: #f9a825; }
-
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="date"],
-  select,
-  textarea {
-    width: 100% !important;
-    padding: 10px 12px !important;
-    border: 1px solid #e5e5e5 !important;
-    border-radius: 6px !important;
-    font-size: 16px !important;
-    font-family: inherit !important;
-    margin-bottom: 8px !important;
-    box-sizing: border-box !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-  }
-  
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  input[type="password"]:focus,
-  input[type="number"]:focus,
-  input[type="date"]:focus,
-  select:focus,
-  textarea:focus {
-    outline: none !important;
-    border-color: #667eea !important;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
-  }
-  
-  /* Generic buttons */
-  button {
-    min-height: 44px !important;
-    transition: all 0.2s !important;
-  }
-  
-  button:active {
-    opacity: 0.8 !important;
-  }
-  
-  /* Stat cards - two column grid */
-  [style*="gridTemplateColumns: repeat(4"] {
-    grid-template-columns: repeat(2, 1fr) !important;
+    cursor: pointer;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    border-radius: 6px;
+    padding: 6px 32px 6px 12px;
   }
 }
 
-/* ============================================================================ */
-/* SMALL MOBILE: 480px and below */
-/* ============================================================================ */
-@media (max-width: 480px) {
-  
-  table tr {
-    padding: 12px !important;
-  }
-  
-  table td {
-    font-size: 12px !important;
-  }
-  
-  table button {
-    font-size: 10px !important;
-    padding: 6px 8px !important;
-    margin: 3px 3px 3px 0 !important;
-    display:none;
-  }
-  
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="date"],
-  select,
-  textarea {
-    padding: 9px 10px !important;
-    font-size: 16px !important;
-  }
-  
-  /* One column layout for stat cards */
-  [style*="gridTemplateColumns: repeat(2"] {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ============================================================================ */
-/* EXTRA SMALL MOBILE: 360px and below */
-/* ============================================================================ */
-@media (max-width: 360px) {
-  
-  table tr {
-    padding: 10px !important;
-  }
-  
-  table td {
-    font-size: 11px !important;
-  }
-  
-  table button {
-    font-size: 9px !important;
-    padding: 5px 6px !important;
-  }
-  
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="date"],
-  select,
-  textarea {
-    padding: 8px !important;
-    font-size: 13px !important;
-  }
-}
-/* Desktop table behavior */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-/* 🔥 MOBILE TABLE TRANSFORM */
-@media (max-width: 768px) {
-
-  table, thead, tbody, th, td, tr {
-    display: block;
-    width: 100% !important;
-  }
-
-  thead {
-    display: none;
-  }
-
-  tr {
-    background: #fff;
-    margin-bottom: 16px;
-    border-radius: 10px;
-    padding: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  }
-
-  td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0 !important;
-    border: none;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  /* REMOVE DESKTOP FIXED WIDTHS */
-  td[style*="minWidth"],
-  td[style*="width"] {
-    min-width: 0 !important;
-    width: 100% !important;
-  }
-}
-@media (max-width: 768px) {
-
-  td select {
-    flex: 1;
-    min-width: 0;              /* 🔥 allows shrinking */
-    max-width: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px;
-    font-size: 14px;
-  }
-}
+/* Any other specific mobile utilities can go here, but avoid generic tag overrides like 'table' or 'input' */

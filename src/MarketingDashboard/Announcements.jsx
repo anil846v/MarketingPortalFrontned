@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 
 const API_BASE_URL = 'http://localhost:9090/api/marketing';
@@ -29,22 +30,22 @@ const Announcements = () => {
 
 
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingSpinner message="Fetching announcements..." />;
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f093fb" strokeWidth="2">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#000' }}>Announcements ({announcements.length})</h2>
       </div>
 
       <div style={{ display: 'grid', gap: '16px' }}>
         {announcements.map(announcement => (
-          <div 
-            key={announcement.id} 
+          <div
+            key={announcement.id}
             style={{
               border: '1px solid #e5e5e5',
               borderRadius: '12px',
@@ -72,7 +73,7 @@ const Announcements = () => {
               height: '100%',
               background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
             }} />
-            
+
             <div style={{ display: 'flex', alignItems: 'start', gap: '16px' }}>
               <div style={{
                 width: '48px',
@@ -85,11 +86,11 @@ const Announcements = () => {
                 flexShrink: 0
               }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                 </svg>
               </div>
-              
+
               <div style={{ flex: 1 }}>
                 <h3 style={{
                   margin: '0 0 8px 0',
@@ -99,7 +100,7 @@ const Announcements = () => {
                 }}>
                   {announcement.title}
                 </h3>
-                
+
                 <p style={{
                   margin: '0 0 12px 0',
                   color: '#666',
@@ -108,7 +109,7 @@ const Announcements = () => {
                 }}>
                   {announcement.message}
                 </p>
-                
+
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -117,8 +118,8 @@ const Announcements = () => {
                   color: '#999'
                 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
                   </svg>
                   {new Date(announcement.createdAt).toLocaleString('en-US', {
                     year: 'numeric',
@@ -132,7 +133,7 @@ const Announcements = () => {
             </div>
           </div>
         ))}
-        
+
         {announcements.length === 0 && (
           <div style={{
             textAlign: 'center',
@@ -140,8 +141,8 @@ const Announcements = () => {
             color: '#999'
           }}>
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.5" style={{ marginBottom: '16px' }}>
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             <p style={{ fontSize: '16px' }}>No announcements available</p>
           </div>

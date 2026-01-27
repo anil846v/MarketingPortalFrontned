@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./assets/styles.css";
 import { API_BASE_URL } from "./config";
 import { validateUsername, validatePassword } from "./utils/security";
+import Logo from "./assets/GeniusMindsLogo.png";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -10,6 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,13 +27,16 @@ export default function LoginPage() {
       if (response.ok) {
         const data = await response.json();
         if (data.valid) {
-          if (data.role === "ADMIN") {
-            navigate("/admin-dashbaord", { replace: true });
-          } else if (data.role === "MARKETING") {
-            navigate("/marketing-dashboard", { replace: true });
-          }else {
-            navigate("/", { replace: true });
-          }
+          setIsSuccess(true);
+          setTimeout(() => {
+            if (data.role === "ADMIN") {
+              navigate("/admin-dashbaord", { replace: true });
+            } else if (data.role === "MARKETING") {
+              navigate("/marketing-dashboard", { replace: true });
+            } else {
+              navigate("/", { replace: true });
+            }
+          }, 800);
         }
       }
     } catch (error) {
@@ -43,7 +48,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
 
-    // Rate limiting - max 5 attempts
+    // Rate limiting - max 20 attempts
     if (loginAttempts >= 20) {
       setError("Too many login attempts. Please try again later.");
       return;
@@ -62,41 +67,64 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ 
-          username: validatedUsername, 
-          password: validatedPassword 
+        body: JSON.stringify({
+          username: validatedUsername,
+          password: validatedPassword
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setLoginAttempts(0); // Reset on success
-        if (data.role === "MARKETING") {
-          navigate("/marketing-dashboard", { replace: true });
-        } else if (data.role === "ADMIN") {
-          navigate("/admin-dashbaord", { replace: true });
-        } else {
-          navigate("/", { replace: true });
-        }
+        setLoginAttempts(0);
+        setIsSuccess(true);
+
+        // Brief delay for the "WOW" transition effect
+        setTimeout(() => {
+          if (data.role === "MARKETING") {
+            navigate("/marketing-dashboard", { replace: true });
+          } else if (data.role === "ADMIN") {
+            navigate("/admin-dashbaord", { replace: true });
+          } else {
+            navigate("/", { replace: true });
+          }
+        }, 1000);
       } else {
         setLoginAttempts(prev => prev + 1);
-        const errorMessage =
-          data.error || "Something went wrong. Please try again.";
+        const errorMessage = data.error || "Invalid credentials. Please try again.";
         throw new Error(errorMessage);
       }
     } catch (err) {
       setError(err.message || "Unexpected error occurred");
-    } finally {
       setLoading(false);
     }
   };
 
+  if (isSuccess) {
+    return (
+      <div className="page-layout">
+        <div style={{ textAlign: 'center' }}>
+          <div className="success-check-wrapper">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#00abe4" strokeWidth="3" className="success-animate">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2 style={{ color: '#1a2b3c', marginTop: '20px', fontWeight: '700' }}>Welcome Back!</h2>
+          <p style={{ color: '#5c728a' }}>Preparing your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-layout">
       <div className="page-container">
-        <div className="form-containerz">
-          <h1 className="form-title">Login</h1>
+        <div className="brand-section">
+          <img src={Logo} alt="Genius Minds Logo" className="logo-img" />
+          <h1 className="brand-name">Genius Minds Making Code</h1>
+          <p className="brand-subtitle">Marketing Portal Login</p>
+        </div>
+        <div className="form-container">
           {error && <p className="error-message">{error}</p>}
           <form onSubmit={handleSignIn} className="form-content">
             <div className="form-group">

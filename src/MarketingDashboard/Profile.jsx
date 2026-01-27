@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const API_BASE_URL = 'http://localhost:9090/api/marketing';
 
@@ -26,7 +27,7 @@ const Profile = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingSpinner message="Loading profile..." />;
 
   if (!profile) return <div>Profile not found</div>;
 
@@ -34,73 +35,74 @@ const Profile = () => {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f093fb" strokeWidth="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
         </svg>
         <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#000' }}>My Profile</h2>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
         {/* Personal Information */}
-       <div style={{
-  background: '#fff',
-  borderRadius: '12px',
-  padding: '24px',
-  border: '1px solid #e5e5e5',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-}}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-   <img
-  src={`http://localhost:9090${profile.profilePhotoPath}`}   // ← remove /api/marketing
-  alt="Profile"
-  style={{
-    width: '90px',
-    height: '90px',
-    borderRadius: '50%',
-    objectFit: 'cover',
-    border: '2px solid #667eea',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-  }}
-/>
-    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#000' }}>
-      Personal Information
-    </h3>
-  </div>
+        <div style={{
+          background: '#fff',
+          borderRadius: '12px',
+          padding: '24px',
+          border: '1px solid #e5e5e5',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <img
+              src={`http://localhost:9090${profile.profilePhotoPath}`}   // ← remove /api/marketing
+              alt="Profile"
+              style={{
+                width: '90px',
+                height: '90px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '2px solid #667eea',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+              }}
+            />
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#000' }}>
+              Personal Information
+            </h3>
+          </div>
 
-  <div style={{ display: 'grid', gap: '16px' }}>
-    <div>
-      <label style={{ 
-        fontSize: '12px', 
-        fontWeight: '600',
-         color: '#666',
-          textTransform: 'uppercase' }}>Full Name</label>
-      <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.fullName || 'N/A'}</div>
-    </div>
-    <div>
-      
-      <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Email</label>
-      <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.email || 'N/A'}</div>
-    </div>
-    <div>
-      <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Phone</label>
-      <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.phoneNumber || 'N/A'}</div>
-    </div>
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-      <div>
-        <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Age</label>
-        <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.age || 'N/A'}</div>
-      </div>
-      <div>
-        <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Gender</label>
-        <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.gender || 'N/A'}</div>
-      </div>
-    </div>
-    <div>
-      <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Address</label>
-      <div style={{ fontSize: '14px', color: '#000', marginTop: '4px', lineHeight: '1.5' }}>{profile.address || 'N/A'}</div>
-    </div>
-  </div>
-</div>
+          <div style={{ display: 'grid', gap: '16px' }}>
+            <div>
+              <label style={{
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#666',
+                textTransform: 'uppercase'
+              }}>Full Name</label>
+              <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.fullName || 'N/A'}</div>
+            </div>
+            <div>
+
+              <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Email</label>
+              <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.email || 'N/A'}</div>
+            </div>
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Phone</label>
+              <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.phoneNumber || 'N/A'}</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Age</label>
+                <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.age || 'N/A'}</div>
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Gender</label>
+                <div style={{ fontSize: '14px', color: '#000', marginTop: '4px' }}>{profile.gender || 'N/A'}</div>
+              </div>
+            </div>
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Address</label>
+              <div style={{ fontSize: '14px', color: '#000', marginTop: '4px', lineHeight: '1.5' }}>{profile.address || 'N/A'}</div>
+            </div>
+          </div>
+        </div>
 
 
         {/* Work Information */}
@@ -127,7 +129,7 @@ const Profile = () => {
             </div>
             <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#000' }}>Work Information</h3>
           </div>
-          
+
           <div style={{ display: 'grid', gap: '16px' }}>
             <div>
               <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>User ID</label>
@@ -193,7 +195,7 @@ const Profile = () => {
             </div>
             <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#000' }}>Account Information</h3>
           </div>
-          
+
           <div style={{ display: 'grid', gap: '16px' }}>
             <div>
               <label style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Member Since</label>
@@ -217,11 +219,11 @@ const Profile = () => {
             </div>
           </div>
         </div>
-        
+
       </div>
-      
+
     </div>
-    
+
   );
 };
 

@@ -93,8 +93,8 @@ const HomeSection = ({ setActiveTab }) => {
   };
 
   const StatCard = ({ icon, label, value, gradient, tabId }) => (
-    <div 
-      style={{...styles.statCard}}
+    <div
+      style={{ ...styles.statCard }}
       onClick={() => {
         if (tabId) {
           setActiveTab(tabId);
@@ -109,7 +109,7 @@ const HomeSection = ({ setActiveTab }) => {
         e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
       }}
     >
-      <div style={{...styles.iconContainer, background: gradient}}>
+      <div style={{ ...styles.iconContainer, background: gradient }}>
         {icon}
       </div>
       <div style={{ flex: 1 }}>
@@ -139,7 +139,7 @@ const HomeSection = ({ setActiveTab }) => {
         <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#000', marginBottom: '8px' }}>
           Dashboard Overview
         </h2>
-       
+
       </div>
 
       <div style={{
@@ -151,10 +151,10 @@ const HomeSection = ({ setActiveTab }) => {
         <StatCard
           icon={
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           }
           label="Total Marketing Users"
@@ -165,8 +165,8 @@ const HomeSection = ({ setActiveTab }) => {
         <StatCard
           icon={
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           }
           label="Total School Visits"
@@ -177,9 +177,9 @@ const HomeSection = ({ setActiveTab }) => {
         <StatCard
           icon={
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-              <line x1="12" y1="22.08" x2="12" y2="12"/>
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
           }
           label="Total Orders"
@@ -190,8 +190,8 @@ const HomeSection = ({ setActiveTab }) => {
         <StatCard
           icon={
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
             </svg>
           }
           label="Active Modules"
@@ -215,69 +215,69 @@ const HomeSection = ({ setActiveTab }) => {
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '12px'
         }}>
-          <button 
+          <button
             onClick={() => setActiveTab('users', true)}
             style={{
-            padding: '12px 20px',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'transform 0.2s'
-          }}
-          onMouseEnter={(e) => e.target.style.transform = 'scale(1.02)'}
-          onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+              padding: '12px 20px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'transform 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.transform = 'scale(1.02)'}
+            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
           >
             + Create New User
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('visits')}
             style={{
-            padding: '12px 20px',
-            background: 'white',
-            color: '#667eea',
-            border: '2px solid #667eea',
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = '#667eea';
-            e.target.style.color = 'white';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'white';
-            e.target.style.color = '#667eea';
-          }}
+              padding: '12px 20px',
+              background: 'white',
+              color: '#667eea',
+              border: '2px solid #667eea',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = '#667eea';
+              e.target.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'white';
+              e.target.style.color = '#667eea';
+            }}
           >
             View All Visits
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('modules')}
             style={{
-            padding: '12px 20px',
-            background: 'white',
-            color: '#667eea',
-            border: '2px solid #667eea',
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = '#667eea';
-            e.target.style.color = 'white';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'white';
-            e.target.style.color = '#667eea';
-          }}
+              padding: '12px 20px',
+              background: 'white',
+              color: '#667eea',
+              border: '2px solid #667eea',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = '#667eea';
+              e.target.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'white';
+              e.target.style.color = '#667eea';
+            }}
           >
             Manage Modules
           </button>

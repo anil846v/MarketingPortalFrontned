@@ -169,6 +169,8 @@ const SchoolVisits = ({ statusFilter: propStatusFilter, setStatusFilter: setProp
       schoolStrenght: visit.schoolStrenght || '',
       boards: visit.boards || '',
       currentSystem: visit.CurrentSystem || '',
+      requiredplatform :visit.requiredplatform ||'',
+      billingFrequency :visit.billingFrequency||'',
       noOfUsers: visit['No Of Users '] || '',
       dataMigrationRequired: visit['Data Migration Required'] || '',
       customFeaturesRequired: visit['Custom Features Required'] || '',
@@ -433,9 +435,23 @@ const SchoolVisits = ({ statusFilter: propStatusFilter, setStatusFilter: setProp
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', color: '#666', fontSize: '14px' }}>
                   <p style={{ margin: '4px 0' }}><strong>Location:</strong> {visit.locationCity}</p>
                   <p style={{ margin: '4px 0' }}><strong>Contact Person:</strong> {visit.contactPersonName}</p>
-                  <p style={{ margin: '4px 0' }}><strong>Phone:</strong> {visit.contactNo}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Designation:</strong> {visit.designation}</p>
                   <p style={{ margin: '4px 0' }}><strong>Visit Date:</strong> {visit.visitedDate}</p>
+                   <p style={{ margin: '4px 0' }}><strong>Phone:</strong> {visit.contactNo}</p>
+                  <p style={{ margin: '4px 0' }}><strong>SchoolStrength:</strong> {visit.schoolStrenght}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Cost PerMemeber:</strong> {visit.costPerMember}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Budget:</strong> {visit.budgetRange}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Current System:</strong> {visit.currentSystem}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Required Platfrom:</strong> {visit.requiredplatform}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Billing Frequency:</strong> {visit.billingFrequency}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Id Cards:</strong> {visit.idCards}</p>
+                  <p style={{ margin: '4px 0' }}><strong>RFID :</strong> {visit.rfidIntegration}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Demo :</strong> {visit.demoDate}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Proposal :</strong> {visit.proposalDate}</p>
+                  <p style={{ margin: '4px 0' }}><strong>Expected Go LiveDate :</strong> {visit.expectedGoLiveDate}</p>
                   <p style={{ margin: '4px 0' }}><strong>Decision Timeline:</strong> {visit.decisionTimeline}</p>
+                  <p style={{ margin: '4px 0' }}><strong>CustmFeatures:</strong> {visit.customFeatureDescription}</p>
+                  
                 </div>
                 {visit.selectedModules && visit.selectedModules.length > 0 && (
                   <div style={{ marginTop: '12px' }}>
