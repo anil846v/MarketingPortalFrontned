@@ -4,14 +4,14 @@ import { API_BASE_URL } from '../config';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import './orderstyle.css';
 // import "../AdminDashboard/adminmobile.css"
 
 const OrdersSection = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modules, setModules] = useState([]);
-  const [downloadType, setDownloadType] = useState('all');
-  const [selectedSchool, setSelectedSchool] = useState('');
+  const [selectedSchool, setSelectedSchool] = useState('ALL');
   const [exportFormat, setExportFormat] = useState('pdf');
 
   useEffect(() => {
@@ -454,9 +454,11 @@ const OrdersSection = () => {
 
   const handleDownload = () => {
     let ordersToDownload = orders;
+    let downloadType = 'all';
 
-    if (downloadType === 'individual' && selectedSchool) {
+    if (selectedSchool !== 'ALL') {
       ordersToDownload = orders.filter(o => o.schoolName === selectedSchool);
+      downloadType = 'individual';
     }
 
     if (ordersToDownload.length === 0) {
@@ -516,70 +518,56 @@ const OrdersSection = () => {
       <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '20px' }}>Accepted Orders ({orders.length})</h2>
       <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e5e5', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
         {/* Export Controls */}
-        <div style={{ padding: '20px', borderBottom: '2px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '20px', background: '#fafbfc', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '300px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#44546f', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Export Type</label>
+        <div className="order-export-center">
+          <div className="order-export-group">
+            <label className="order-export-label">Export Data For:</label>
             <select
-              value={downloadType}
-              onChange={(e) => {
-                setDownloadType(e.target.value);
-                setSelectedSchool('');
-              }}
-              style={{ width: '100%', padding: '10px 12px', fontSize: '14px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', color: '#374151', cursor: 'pointer', fontWeight: '500' }}
+              value={selectedSchool}
+              onChange={(e) => setSelectedSchool(e.target.value)}
+              className="order-select"
             >
-              <option value="all">All Orders</option>
-              <option value="individual">Specific School</option>
+              <option value="ALL">All Orders</option>
+              {[...new Set(orders.map(o => o.schoolName))].sort().map((school, idx) => (
+                <option key={idx} value={school}>{school}</option>
+              ))}
             </select>
           </div>
 
-          {downloadType === 'individual' && (
-            <div style={{ flex: 1, minWidth: '300px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#44546f', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Select School</label>
-              <select
-                value={selectedSchool}
-                onChange={(e) => setSelectedSchool(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', fontSize: '14px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', color: '#374151', cursor: 'pointer', fontWeight: '500' }}
-              >
-                <option value="">Choose a school...</option>
-                {[...new Set(orders.map(o => o.schoolName))].map((school, idx) => (
-                  <option key={idx} value={school}>{school}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div style={{ flex: 1, minWidth: '300px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#44546f', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>File Format</label>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => setExportFormat('pdf')}
-                style={{ flex: 1, padding: '10px 16px', background: exportFormat === 'pdf' ? 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)' : '#ecf0f1', color: exportFormat === 'pdf' ? 'white' : '#2c3e50', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}
-              >
-                PDF
-              </button>
-              <button
-                onClick={() => setExportFormat('excel')}
-                style={{ flex: 1, padding: '10px 16px', background: exportFormat === 'excel' ? 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)' : '#ecf0f1', color: exportFormat === 'excel' ? 'white' : '#27ae60', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}
-              >
-                Excel
-              </button>
-            </div>
+          <div className="order-export-actions">
+            <button
+              onClick={() => {
+                setExportFormat('pdf');
+                handleDownload();
+              }}
+              disabled={orders.length === 0}
+              className="order-btn-pdf"
+              title="Download PDF Report"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export PDF
+            </button>
+            <button
+              onClick={() => {
+                setExportFormat('excel');
+                handleDownload();
+              }}
+              disabled={orders.length === 0}
+              className="order-btn-excel"
+              title="Download Excel Report"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                <path d="M5 12V5a2 2 0 0 1 2-2h7l5 5v4"></path>
+                <path d="M9 15.5l3 3 3-3"></path>
+                <path d="M12 12v6.5"></path>
+              </svg>
+              Export Excel
+            </button>
           </div>
-
-          <button
-            onClick={handleDownload}
-            disabled={orders.length === 0 || (downloadType === 'individual' && !selectedSchool)}
-            style={{ padding: '12px 28px', background: (orders.length === 0 || (downloadType === 'individual' && !selectedSchool)) ? '#bdc3c7' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', border: 'none', borderRadius: '8px', cursor: (orders.length === 0 || (downloadType === 'individual' && !selectedSchool)) ? 'not-allowed' : 'pointer', fontWeight: '700', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)' }}
-            onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)')}
-            onMouseLeave={(e) => !e.currentTarget.disabled && (e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Download {exportFormat.toUpperCase()}
-          </button>
         </div>
 
         <div className="table-container">
