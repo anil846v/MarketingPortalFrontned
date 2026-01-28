@@ -1147,38 +1147,27 @@ const VisitsSection = () => {
         </div>
 
         <div className="table-container">
-          <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table className="responsive-table">
             <thead>
-              <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #e5e5e5' }}>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>ID</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>School Name</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Visited Date</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Marketing Executive</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Location</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Status</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Actions</th>
+              <tr>
+                <th>ID</th>
+                <th>School Name</th>
+                <th>Visited Date</th>
+                <th>Marketing Executive</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {visits.map((visit, index) => (
-                <tr
-                  key={visit.id}
-                  style={{ borderBottom: '1px solid #f0f0f0', transition: 'background 0.2s' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#f8f9fa';
-                    setHoveredVisitId(visit.id);
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'white';
-                    setHoveredVisitId(null);
-                  }}
-                >
-                  <td data-label="Id" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{index + 1}</td>
-                  <td data-label="SchoolName" style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#000' }}>{visit.schoolName}</td>
-                  <td data-label="VisitedDate" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{visit.visitedDate}</td>
-                  <td data-label="ExecutiveName" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{visit.marketingExecutiveName}</td>
-                  <td data-label="LocationCity" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{visit.locationCity}</td>
-                  <td style={{ padding: '16px', fontSize: '14px', color: '#333' }}>
+                <tr key={visit.id}>
+                  <td data-label="Id">{index + 1}</td>
+                  <td data-label="SchoolName" style={{ fontWeight: '600', color: '#000' }}>{visit.schoolName}</td>
+                  <td data-label="VisitedDate">{visit.visitedDate}</td>
+                  <td data-label="ExecutiveName">{visit.marketingExecutiveName}</td>
+                  <td data-label="LocationCity">{visit.locationCity}</td>
+                  <td>
                     <select data-label="Status"
                       value={visit.status}
                       onChange={(e) => handleChangeStatus(visit.id, e.target.value)}
@@ -1189,7 +1178,7 @@ const VisitsSection = () => {
                       <option value="REJECTED">REJECTED</option>
                     </select>
                   </td>
-                  <td style={{ padding: '16px', minWidth: '140px', whiteSpace: 'nowrap' }}>
+                  <td style={{ minWidth: '140px', whiteSpace: 'nowrap' }}>
                     <button onClick={() => { setSelectedVisit(visit); setIsEditMode(false); }} style={{ padding: '6px 10px', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px', margin: '0 4px 0 0' }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
                       View

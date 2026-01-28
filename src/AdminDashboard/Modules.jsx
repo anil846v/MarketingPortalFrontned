@@ -80,25 +80,25 @@ const ModulesSection = () => {
       {!showCreateForm && !editingModule && (
         <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e5e5', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
           <div className="table-container">
-            <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className="responsive-table">
               <thead>
-                <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #e5e5e5' }}>
-                  <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '80px' }}>ID</th>
-                  <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '200px' }}>Module Name</th>
-                  <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Description</th>
-                  <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '150px' }}>Status</th>
-                  <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666', width: '120px' }}>Actions</th>
+                <tr>
+                  <th style={{ width: '80px' }}>ID</th>
+                  <th style={{ width: '200px' }}>Module Name</th>
+                  <th>Description</th>
+                  <th style={{ width: '150px' }}>Status</th>
+                  <th style={{ width: '120px' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {modules.map((module, index) => (
-                  <tr key={module.id} style={{ borderBottom: '1px solid #f0f0f0', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'} onMouseLeave={(e) => e.currentTarget.style.background = 'white'}>
-                    <td data-label="ID" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{index + 1}</td>
-                    <td data-label="Module Name" style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#000' }}>{module.moduleName}</td>
-                    <td data-label="Description" style={{ padding: '16px', fontSize: '14px', color: '#333', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <tr key={module.id}>
+                    <td data-label="ID">{index + 1}</td>
+                    <td data-label="Module Name" style={{ fontWeight: '600', color: '#000' }}>{module.moduleName}</td>
+                    <td data-label="Description" style={{ maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       <span title={module.description}>{module.description || 'No description'}</span>
                     </td>
-                    <td data-label="Status" style={{ padding: '16px' }}>
+                    <td data-label="Status">
                       <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }}>
                         <div style={{ position: 'relative', width: '44px', height: '24px', background: module.isActive ? '#4CAF50' : '#ccc', borderRadius: '12px', transition: 'background 0.3s' }}>
                           <input type="checkbox" checked={module.isActive} onChange={() => handleToggleStatus(module)} style={{ display: 'none' }} />
@@ -107,7 +107,7 @@ const ModulesSection = () => {
                         <span style={{ fontSize: '12px', fontWeight: '600', color: module.isActive ? '#4CAF50' : '#999' }}>{module.isActive ? 'Active' : 'Inactive'}</span>
                       </label>
                     </td>
-                    <td style={{ padding: '16px' }}>
+                    <td>
                       <button onClick={() => setEditingModule(module)} style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                         Edit

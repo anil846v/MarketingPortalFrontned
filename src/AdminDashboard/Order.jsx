@@ -571,28 +571,28 @@ const OrdersSection = () => {
         </div>
 
         <div className="table-container">
-          <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table className="responsive-table">
             <thead>
-              <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #e5e5e5' }}>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>ID</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>School Name</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Order Date</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Go Live Date</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Initial Payment</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Status</th>
-                <th style={{ padding: '16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#666' }}>Actions</th>
+              <tr>
+                <th>ID</th>
+                <th>School Name</th>
+                <th>Order Date</th>
+                <th>Go Live Date</th>
+                <th>Initial Payment</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order, index) => (
-                <tr key={order.id} style={{ borderBottom: '1px solid #f0f0f0', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'} onMouseLeave={(e) => e.currentTarget.style.background = 'white'}>
-                  <td data-label="School Name" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{index + 1}</td>
-                  <td data-label="Order Date" style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#000' }}>{order.schoolName}</td>
-                  <td data-label="Go Live Date" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{order.orderBookingDate}</td>
-                  <td data-label="School Name" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{order.expectedGoLiveDate}</td>
-                  <td data-label="Initial Payment" style={{ padding: '16px', fontSize: '14px', fontWeight: '600', color: '#4CAF50' }}>₹{order.initialPayment}</td>
-                  <td data-label="Status" style={{ padding: '16px', fontSize: '14px', color: '#333' }}>{order.status}</td>
-                  <td style={{ padding: '16px' }}>
+                <tr key={order.id}>
+                  <td data-label="School Name">{index + 1}</td>
+                  <td data-label="Order Date" style={{ fontWeight: '600', color: '#000' }}>{order.schoolName}</td>
+                  <td data-label="Go Live Date">{order.orderBookingDate}</td>
+                  <td data-label="School Name">{order.expectedGoLiveDate}</td>
+                  <td data-label="Initial Payment" style={{ fontWeight: '600', color: '#4CAF50' }}>₹{order.initialPayment}</td>
+                  <td data-label="Status">{order.status}</td>
+                  <td>
                     <button onClick={() => setSelectedOrder(order)} style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
                       View Details

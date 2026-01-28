@@ -4,6 +4,7 @@ import { showToast } from '../components/ToastContainer';
 import { confirmAction } from '../components/ConfirmationProvider';
 import { API_BASE_URL } from '../config';
 import { validateEmail, validatePhone, sanitizeInput } from '../utils/validation';
+import '../assets/userwisevistsstyle.css';
 
 const UsersSection = ({ showNewUserForm, setShowNewUserForm }) => {
   const [users, setUsers] = useState([]);
@@ -162,8 +163,8 @@ const UsersSection = ({ showNewUserForm, setShowNewUserForm }) => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Username</th>
               <th>Full Name</th>
+              <th>Username</th>
               <th>Phone</th>
               <th>Region</th>
               <th>Status</th>
@@ -175,6 +176,27 @@ const UsersSection = ({ showNewUserForm, setShowNewUserForm }) => {
               <>
                 <tr key={user.userId}>
                   <td>{index + 1}</td>
+                  <td
+                    onClick={() => setExpandedUser(expandedUser === user.userId ? null : user.userId)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="uw-executive-cell">
+                      {user.profilePhotoPath ? (
+                        <img
+                          src={`${API_BASE_URL}${user.profilePhotoPath}`}
+                          alt=""
+                          className="uw-profile-img"
+                        />
+                      ) : (
+                        <div className="uw-profile-placeholder">
+                          {user.fullName?.[0] || 'U'}
+                        </div>
+                      )}
+                      <div>
+                        <div className="uw-executive-name">{user.fullName}</div>
+                      </div>
+                    </div>
+                  </td>
                   <td style={{ width: '150px', minWidth: '150px' }}>
                     <button
                       onClick={() => setExpandedUser(expandedUser === user.userId ? null : user.userId)}
@@ -193,7 +215,6 @@ const UsersSection = ({ showNewUserForm, setShowNewUserForm }) => {
                       {user.username}
                     </button>
                   </td>
-                  <td>{user.fullName}</td>
                   <td>{user.phoneNumber}</td>
                   <td>{user.assignedRegion}</td>
                   <td>
@@ -267,18 +288,19 @@ const UsersSection = ({ showNewUserForm, setShowNewUserForm }) => {
                         </button>
                         {user.profilePhotoPath && (
                           <div style={{ marginBottom: '16px', textAlign: 'center' }}>
-                            <img
-                              src={`${API_BASE_URL}${user.profilePhotoPath}`}
-                              alt="Profile"
-                              style={{
-                                width: '90px',
-                                height: '90px',
-                                borderRadius: '50%',
-                                objectFit: 'cover',
-                                border: '2px solid #667eea'
-
-                              }}
-                            />
+                            <div style={{ display: 'inline-block', padding: '1px', background: '#fff', border: '1px solid #ddd', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+                              <img
+                                src={`${API_BASE_URL}${user.profilePhotoPath}`}
+                                alt="Passport Size Profile"
+                                style={{
+                                  width: '120px',
+                                  height: '150px',
+                                  objectFit: 'cover',
+                                  display: 'block'
+                                }}
+                              />
+                              {/* <div style={{ marginTop: '8px', fontSize: '10px', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>Passport Size Photo</div> */}
+                            </div>
                           </div>
                         )}
 
