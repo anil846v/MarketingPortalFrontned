@@ -123,6 +123,7 @@ const MarketingDashboard = () => {
           <h1>GMMC SchoolsVisited Portal</h1>
           <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </header>
+        <div>hi</div>
 
         <main className={`content-area ${activeTab === 'messages' ? 'no-padding' : ''}`}
           onClick={() => { if (sidebarOpen && window.innerWidth <= 768) setSidebarOpen(false); }}
