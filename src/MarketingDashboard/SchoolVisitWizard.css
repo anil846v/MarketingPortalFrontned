@@ -1,0 +1,555 @@
+/* SchoolVisitWizard.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.wizard-container {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 24px;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    color: #111827;
+}
+
+.wizard-header {
+    background: #f9fafb;
+    padding: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.wizard-title {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.wizard-subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.progress-container {
+    background: #fff;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.steps-wrapper {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step-item {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.step-icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.step-item.active .step-icon-circle {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    transform: scale(1.1);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+}
+
+.step-item.completed .step-icon-circle {
+    background: #10b981;
+    color: #fff;
+}
+
+.step-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    transition: all 0.3s;
+}
+
+.step-item.active .step-label {
+    color: #667eea;
+}
+
+.step-line {
+    position: absolute;
+    top: 20px;
+    left: calc(50% + 20px);
+    width: calc(100% - 40px);
+    height: 3px;
+    background: #f3f4f6;
+    transition: all 0.4s;
+    z-index: 1;
+}
+
+.step-line.completed {
+    background: #10b981;
+}
+
+.form-body {
+    padding: 32px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+}
+
+.field-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+    display: flex;
+    align-items: center;
+}
+
+.required-star {
+    color: #ef4444;
+    margin-left: 4px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.field-input,
+.field-select,
+.field-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: #fff;
+    color: #111827;
+    appearance: none;
+}
+
+.field-input[type="date"] {
+    position: relative;
+}
+
+.field-input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+}
+
+.calendar-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6b7280;
+}
+
+.field-input:focus,
+.field-select:focus,
+.field-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.field-input.error,
+.field-select.error {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+}
+
+.error-text {
+    font-size: 11px;
+    color: #ef4444;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.footer-actions {
+    padding: 20px 32px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-group {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-wizard {
+    padding: 12px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+}
+
+.btn-cancel {
+    background: #fff;
+    color: #6b7280;
+    border: 1.5px solid #e5e7eb;
+}
+
+.btn-cancel:hover {
+    background: #f9fafb;
+    color: #374151;
+    border-color: #d1d5db;
+}
+
+.btn-prev {
+    background: #fff;
+    color: #667eea;
+    border: 1.5px solid #667eea;
+}
+
+.btn-prev:hover {
+    background: #f5f3ff;
+}
+
+.btn-next {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+}
+
+.btn-next:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(102, 126, 234, 0.35);
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(16, 185, 129, 0.35);
+}
+
+.btn-wizard:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Modules Section */
+.modules-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.modules-list {
+    display: grid;
+    gap: 16px;
+}
+
+.module-card {
+    padding: 20px;
+    border-radius: 12px;
+    background: #f9fafb;
+    border: 2.5px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.module-card.selected {
+    background: #fff;
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.08);
+}
+
+.module-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.module-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.module-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-switch {
+    width: 48px;
+    height: 24px;
+    background: #d1d5db;
+    border-radius: 12px;
+    position: relative;
+    transition: background 0.3s;
+}
+
+.toggle-switch.on {
+    background: #10b981;
+}
+
+.toggle-knob {
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: left 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-switch.on .toggle-knob {
+    left: 26px;
+}
+
+/* Date Input Styling */
+.date-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.wizard-input {
+    width: 100%;
+    padding: 10px 12px;
+    padding-right: 35px;
+    /* Space for icon */
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+    color: #000;
+    transition: all 0.2s;
+    color-scheme: light;
+    /* Forces the native date picker to be light themed */
+}
+
+.wizard-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.calendar-icon-svg {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6b7280;
+}
+
+/* Hide native icon but keep functionality for better visual control */
+.wizard-input::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+}
+
+.remarks-textarea {
+    margin-top: 16px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    min-height: 80px;
+    resize: vertical;
+}
+
+.sv-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: svModalFadeIn 0.3s ease-out;
+}
+
+.sv-modal-container {
+    background: #ffffff !important;
+    padding: 0;
+    border-radius: 16px;
+    width: 500px;
+    max-width: 95%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: svModalSlideUp 0.3s ease-out;
+    border: 1px solid #e5e7eb;
+}
+
+.sv-modal-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid #f3f4f6;
+    background: #ffffff !important;
+}
+
+.sv-modal-title {
+    margin: 0;
+    color: #111827 !important;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.sv-modal-body {
+    padding: 24px 32px;
+    background: #ffffff !important;
+}
+
+.sv-modal-helper-text {
+    margin: 0 0 16px 0;
+    font-size: 14px;
+    color: #4b5563 !important;
+    line-height: 1.5;
+}
+
+.sv-modal-textarea {
+    width: 100%;
+    min-height: 140px;
+    padding: 16px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #111827 !important;
+    background: #f9fafb !important;
+    resize: none;
+    transition: all 0.2s;
+    display: block;
+}
+
+.sv-modal-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+
+.sv-modal-footer {
+    padding: 16px 32px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    background: #f9fafb;
+    border-top: 1px solid #f3f4f6;
+}
+
+.sv-modal-btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    min-width: 120px;
+}
+
+.sv-modal-btn-cancel {
+    background: #ffffff;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
+
+.sv-modal-btn-cancel:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+    border-color: #9ca3af;
+}
+
+.sv-modal-btn-save {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff !important;
+    box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.2);
+}
+
+.sv-modal-btn-save:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(102, 126, 234, 0.3);
+}
+
+@keyframes svModalFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes svModalSlideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

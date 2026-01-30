@@ -224,25 +224,6 @@ const SchoolVisits = ({ statusFilter: propStatusFilter, setStatusFilter: setProp
 
   return (
     <div className="school-visits-container">
-      <div className="header-section">
-        <div className="header-title-wrapper">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-          <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#000' }}>School Visits ({visits.length})</h2>
-        </div>
-        <button
-          onClick={() => { setShowForm(!showForm); setEditingVisit(null); }}
-          className={`btn-new-visit ${showForm ? 'cancel' : ''}`}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            {showForm ? <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></> : <><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></>}
-          </svg>
-          {showForm ? 'Cancel' : 'New Visit'}
-        </button>
-      </div>
-
       {showAcceptModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -287,19 +268,40 @@ const SchoolVisits = ({ statusFilter: propStatusFilter, setStatusFilter: setProp
         </div>
       )}
 
-      {!showForm && (
-        <div className="filter-container">
-          {['ALL', 'PENDING', 'ACCEPTED', 'REJECTED'].map(status => (
-            <button
-              key={status}
-              onClick={() => handleStatusFilterChange(status)}
-              className={`filter-btn ${statusFilter === status ? 'active' : ''}`}
-            >
-              {status === 'ALL' ? `All Visits (${visits.length})` : `${status.charAt(0) + status.slice(1).toLowerCase()} (${visits.filter(v => v.status === status).length})`}
-            </button>
-          ))}
+      <div className="sticky-header-container">
+        <div className="header-section">
+          <div className="header-title-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#000' }}>School Visits ({visits.length})</h2>
+          </div>
+          <button
+            onClick={() => { setShowForm(!showForm); setEditingVisit(null); }}
+            className={`btn-new-visit ${showForm ? 'cancel' : ''}`}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              {showForm ? <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></> : <><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></>}
+            </svg>
+            {showForm ? 'Cancel' : 'New Visit'}
+          </button>
         </div>
-      )}
+
+        {!showForm && (
+          <div className="filter-container">
+            {['ALL', 'PENDING', 'ACCEPTED', 'REJECTED'].map(status => (
+              <button
+                key={status}
+                onClick={() => handleStatusFilterChange(status)}
+                className={`filter-btn ${statusFilter === status ? 'active' : ''}`}
+              >
+                {status === 'ALL' ? `All Visits (${visits.length})` : `${status.charAt(0) + status.slice(1).toLowerCase()} (${visits.filter(v => v.status === status).length})`}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {showForm ? (
         <SchoolVisitWizard
@@ -311,112 +313,17 @@ const SchoolVisits = ({ statusFilter: propStatusFilter, setStatusFilter: setProp
         />
       ) : (
         <div className="visits-grid">
-          {visits.filter(v => statusFilter === 'ALL' || v.status === statusFilter).map(visit => {
-            // Internal component for the tabbed card
-            const VisitCard = ({ visit, modules }) => {
-              const [activeTab, setActiveTab] = useState('general');
-
-              return (
-                <div className={`visit-card ${visit.status.toLowerCase()}`}>
-                  <div className="visit-card-header">
-                    <h3 className="school-name">{visit.schoolName}</h3>
-                    <span className={`status-badge ${visit.status.toLowerCase()}`}>{visit.status}</span>
-                  </div>
-
-                  <div className="card-tabs">
-                    <button onClick={() => setActiveTab('general')} className={`card-tab-btn ${activeTab === 'general' ? 'active' : ''}`}>Info</button>
-                    <button onClick={() => setActiveTab('technical')} className={`card-tab-btn ${activeTab === 'technical' ? 'active' : ''}`}>Tech</button>
-                    <button onClick={() => setActiveTab('financial')} className={`card-tab-btn ${activeTab === 'financial' ? 'active' : ''}`}>Finance</button>
-                  </div>
-
-                  <div className="card-tab-content">
-                    {activeTab === 'general' && (
-                      <div className="card-details-grid">
-                        <div className="detail-item"><span className="detail-label">Location:</span><span className="detail-value">{visit.locationCity}</span></div>
-                        <div className="detail-item"><span className="detail-label">Person:</span><span className="detail-value">{visit.contactPersonName} ({visit.designation})</span></div>
-                        <div className="detail-item"><span className="detail-label">Phone:</span><span className="detail-value">{visit.contactNo}</span></div>
-                        <div className="detail-item" style={{ gridColumn: '1 / -1' }}><span className="detail-label">Email:</span><span className="detail-value" style={{ wordBreak: 'break-all' }}>{visit.emailId || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">Strength:</span><span className="detail-value">{visit.schoolStrenght || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">Boards:</span><span className="detail-value">{visit.boards || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">D-Maker:</span><span className="detail-value">{visit.decisionMakerName || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">Timeline:</span><span className="detail-value">{visit.decisionTimeline || 'N/A'}</span></div>
-                      </div>
-                    )}
-
-                    {activeTab === 'technical' && (
-                      <div className="card-details-grid">
-                        <div className="detail-item"><span className="detail-label">Platform:</span><span className="detail-value">{visit.requiredplatform || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">Current:</span><span className="detail-value">{visit.currentSystem || 'None'}</span></div>
-                        <div className="detail-item"><span className="detail-label">Users:</span><span className="detail-value">{visit.noOfUsers || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">Migration:</span><span className="detail-value">{visit.dataMigrationRequired || 'No'}</span></div>
-                        <div className="detail-item"><span className="detail-label">ID Cards:</span><span className="detail-value">{visit.idCards || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">RFID:</span><span className="detail-value">{visit.rfidIntegration || 'N/A'}</span></div>
-                        {visit.customFeatureDescription && (
-                          <div className="detail-item" style={{ gridColumn: '1 / -1' }}>
-                            <span className="detail-label">Custom Features:</span>
-                            <span className="detail-value scrollable-item">{visit.customFeatureDescription}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {activeTab === 'financial' && (
-                      <div className="card-details-grid">
-                        <div className="detail-item"><span className="detail-label">Budget:</span><span className="detail-value">{visit.budgetRange || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">Cost/Mem:</span><span className="detail-value">{visit.costPerMember || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">Billing:</span><span className="detail-value">{visit.billingFrequency || 'N/A'}</span></div>
-                        <div className="detail-item"><span className="detail-label">PG Pref:</span><span className="detail-value">{visit.paymentGatewayPreference || 'N/A'}</span></div>
-                        {visit.initialPayment && (
-                          <div className="detail-item"><span className="detail-label">Init Pay:</span><span className="detail-value">₹{visit.initialPayment}</span></div>
-                        )}
-                        <div className="detail-item"><span className="detail-label">Demo:</span><span className="detail-value">{visit.demoDate ? `Scheduled: ${visit.demoDate}` : (visit.demoRequired || 'No')}</span></div>
-                        <div className="detail-item"><span className="detail-label">Proposal:</span><span className="detail-value">{visit.proposalDate ? `Sent: ${visit.proposalDate}` : (visit.proposalSent || 'No')}</span></div>
-                        <div className="detail-item"><span className="detail-label">Go-Live:</span><span className="detail-value">{visit.expectedGoLiveDate || 'TBD'}</span></div>
-                        {visit.paymentTerms && (
-                          <div className="detail-item" style={{ gridColumn: '1 / -1' }}>
-                            <span className="detail-label">Payment Terms:</span>
-                            <span className="detail-value scrollable-item">{visit.paymentTerms}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="always-visible-modules">
-                    <span className="detail-label">Selected Modules:</span>
-                    <div className="module-tags" style={{ marginTop: '6px' }}>
-                      {visit.selectedModules?.length > 0 ? visit.selectedModules.map(module => {
-                        const mod = modules.find(m => m.id === module.moduleId);
-                        return mod ? <span key={module.moduleId} className="module-tag">{mod.moduleName}</span> : null;
-                      }) : <span style={{ fontSize: '12px', color: '#94a3b8', fontStyle: 'italic' }}>No modules selected</span>}
-                    </div>
-                  </div>
-
-                  {visit.status === 'REJECTED' && visit.rejectionReason && (
-                    <div className="rejection-box">
-                      <strong style={{ color: '#c53030', fontSize: '11px', textTransform: 'uppercase' }}>Reason:</strong>
-                      <p className="rejection-text">{visit.rejectionReason}</p>
-                    </div>
-                  )}
-
-                  <div className="card-actions">
-                    <button onClick={() => handleEdit(visit)} className="btn-action btn-edit">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
-                      Edit
-                    </button>
-                    {visit.status === 'PENDING' && (
-                      <>
-                        <button onClick={() => handleChangeStatus(visit.id, 'ACCEPTED')} className="btn-action btn-accept">Accept</button>
-                        <button onClick={() => handleChangeStatus(visit.id, 'REJECTED')} className="btn-action btn-reject">Reject</button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            };
-
-            return <VisitCard key={visit.id} visit={visit} modules={modules} />;
-          })}
+          {visits
+            .filter(v => statusFilter === 'ALL' || v.status === statusFilter)
+            .map(visit => (
+              <VisitCard
+                key={visit.id}
+                visit={visit}
+                modules={modules}
+                onEdit={handleEdit}
+                onStatusChange={handleChangeStatus}
+              />
+            ))}
         </div>
       )}
 
@@ -429,6 +336,115 @@ const SchoolVisits = ({ statusFilter: propStatusFilter, setStatusFilter: setProp
           <p style={{ marginTop: '16px', fontSize: '18px', color: '#718096', fontWeight: '500' }}>No school visits recorded yet</p>
         </div>
       )}
+    </div>
+  );
+};
+
+const VisitCard = ({ visit, modules, onEdit, onStatusChange }) => {
+  const [activeTab, setActiveTab] = useState('general');
+
+  return (
+    <div className={`visit-card ${visit.status.toLowerCase()}`}>
+      <div className="visit-card-header">
+        <h3 className="school-name">{visit.schoolName}</h3>
+        <span className={`status-badge ${visit.status.toLowerCase()}`}>{visit.status}</span>
+      </div>
+
+      <div className="card-tabs">
+        <button onClick={() => setActiveTab('general')} className={`card-tab-btn ${activeTab === 'general' ? 'active' : ''}`}>Info</button>
+        <button onClick={() => setActiveTab('technical')} className={`card-tab-btn ${activeTab === 'technical' ? 'active' : ''}`}>Tech</button>
+        <button onClick={() => setActiveTab('financial')} className={`card-tab-btn ${activeTab === 'financial' ? 'active' : ''}`}>Finance</button>
+      </div>
+
+      <div className="card-tab-content">
+        {activeTab === 'general' && (
+          <div className="card-details-grid">
+            <div className="detail-item"><span className="detail-label">Location:</span><span className="detail-value">{visit.locationCity}</span></div>
+            <div className="detail-item"><span className="detail-label">Person:</span><span className="detail-value">{visit.contactPersonName} ({visit.designation})</span></div>
+            <div className="detail-item"><span className="detail-label">Phone:</span><span className="detail-value">{visit.contactNo}</span></div>
+            <div className="detail-item" style={{ gridColumn: '1 / -1' }}><span className="detail-label">Email:</span><span className="detail-value" style={{ wordBreak: 'break-all' }}>{visit.emailId || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">Strength:</span><span className="detail-value">{visit.schoolStrenght || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">Boards:</span><span className="detail-value">{visit.boards || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">D-Maker:</span><span className="detail-value">{visit.decisionMakerName || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">Timeline:</span><span className="detail-value">{visit.decisionTimeline || 'N/A'}</span></div>
+          </div>
+        )}
+
+        {activeTab === 'technical' && (
+          <div className="card-details-grid">
+            <div className="detail-item"><span className="detail-label">Platform:</span><span className="detail-value">{visit.requiredplatform || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">Current:</span><span className="detail-value">{visit.currentSystem || 'None'}</span></div>
+            <div className="detail-item"><span className="detail-label">Users:</span><span className="detail-value">{visit.noOfUsers || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">Migration:</span><span className="detail-value">{visit.dataMigrationRequired || 'No'}</span></div>
+            <div className="detail-item"><span className="detail-label">ID Cards:</span><span className="detail-value">{visit.idCards || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">RFID:</span><span className="detail-value">{visit.rfidIntegration || 'N/A'}</span></div>
+            {visit.customFeatureDescription && (
+              <div className="detail-item" style={{ gridColumn: '1 / -1' }}>
+                <span className="detail-label">Custom Features:</span>
+                <span className="detail-value scrollable-item">{visit.customFeatureDescription}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'financial' && (
+          <div className="card-details-grid">
+            <div className="detail-item"><span className="detail-label">Budget:</span><span className="detail-value">{visit.budgetRange || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">Cost/Mem:</span><span className="detail-value">{visit.costPerMember || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">Billing:</span><span className="detail-value">{visit.billingFrequency || 'N/A'}</span></div>
+            <div className="detail-item"><span className="detail-label">PG Pref:</span><span className="detail-value">{visit.paymentGatewayPreference || 'N/A'}</span></div>
+            {visit.initialPayment && (
+              <div className="detail-item"><span className="detail-label">Init Pay:</span><span className="detail-value">₹{visit.initialPayment}</span></div>
+            )}
+            <div className="detail-item"><span className="detail-label">Demo:</span><span className="detail-value">{visit.demoDate ? `Scheduled: ${visit.demoDate}` : (visit.demoRequired || 'No')}</span></div>
+            <div className="detail-item"><span className="detail-label">Proposal:</span><span className="detail-value">{visit.proposalDate ? `Sent: ${visit.proposalDate}` : (visit.proposalSent || 'No')}</span></div>
+            <div className="detail-item"><span className="detail-label">Go-Live:</span><span className="detail-value">{visit.expectedGoLiveDate || 'TBD'}</span></div>
+            {visit.paymentTerms && (
+              <div className="detail-item" style={{ gridColumn: '1 / -1' }}>
+                <span className="detail-label">Payment Terms:</span>
+                <span className="detail-value scrollable-item">{visit.paymentTerms}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="always-visible-modules">
+        <span className="detail-label">Selected Modules:</span>
+        <div className="module-tags" style={{ marginTop: '6px' }}>
+          {visit.selectedModules?.length > 0 ? (
+            visit.selectedModules.map(module => {
+              const mod = modules.find(m => m.id === module.moduleId);
+              return mod ? <span key={module.moduleId} className="module-tag">{mod.moduleName}</span> : null;
+            })
+          ) : (
+            <span style={{ fontSize: '12px', color: '#94a3b8', fontStyle: 'italic' }}>No modules selected</span>
+          )}
+        </div>
+      </div>
+
+      {visit.status === 'REJECTED' && visit.rejectionReason && (
+        <div className="rejection-box">
+          <strong style={{ color: '#c53030', fontSize: '11px', textTransform: 'uppercase' }}>Reason:</strong>
+          <p className="rejection-text">{visit.rejectionReason}</p>
+        </div>
+      )}
+
+      <div className="card-actions">
+        <button onClick={() => onEdit(visit)} className="btn-action btn-edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+          Edit
+        </button>
+        {visit.status === 'PENDING' && (
+          <>
+            <button onClick={() => onStatusChange(visit.id, 'ACCEPTED')} className="btn-action btn-accept">Accept</button>
+            <button onClick={() => onStatusChange(visit.id, 'REJECTED')} className="btn-action btn-reject">Reject</button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

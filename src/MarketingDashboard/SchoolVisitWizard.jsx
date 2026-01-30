@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
+import { Calendar } from 'lucide-react';
+import './SchoolVisitWizard.css';
 
 const SchoolVisitWizard = ({ modules, onSubmit, onCancel, editingVisit, loading }) => {
     const [showCustomFeatureModal, setShowCustomFeatureModal] = useState(false);
+    const [showErrors, setShowErrors] = useState(false);
     const [customFeatureDescription, setCustomFeatureDescription] = useState('');
     const [selectedModule, setSelectedModule] = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
@@ -45,16 +48,66 @@ const SchoolVisitWizard = ({ modules, onSubmit, onCancel, editingVisit, loading 
     ];
 
     const validateStep = () => {
-        // if (currentStep === 0) return formData.schoolName && formData.locationCity;
-        //  if (currentStep === 1) return formData.contactPersonName  ;
+        if (currentStep === 0) {
+            return (
+                formData.schoolName &&
+                formData.schoolStrenght &&
+                formData.contactPersonName &&
+                formData.designation &&
+                formData.contactNo &&
+                formData.emailId &&
+                formData.decisionMakerName &&
+                formData.decisionTimeline &&
+                formData.locationCity
+            );
+        }
+        if (currentStep === 1) {
+            return (
+                formData.boards &&
+                formData.currentSystem &&
+                formData.requiredplatform &&
+                formData.billingFrequency &&
+                formData.noOfUsers &&
+                formData.costPerMember &&
+                formData.budgetRange &&
+                formData.paymentGatewayPreference &&
+                formData.proposalSent &&
+                formData.proposalDate &&
+                formData.expectedGoLiveDate
+            );
+        }
+        if (currentStep === 2) {
+            const basic = (
+                formData.dataMigrationRequired &&
+                formData.customFeaturesRequired &&
+                formData.idCards &&
+                formData.demoRequired
+            );
+            if (!basic) return false;
+
+            if (formData.customFeaturesRequired === 'YES' && !formData.customFeatureDescription) return false;
+            if ((formData.idCards === 'Premium' || formData.idCards === 'Normal') && !formData.rfidIntegration) return false;
+            if (formData.demoRequired === 'YES' && !formData.demoDate) return false;
+
+            return true;
+        }
+        if (currentStep === 3) {
+            return formData.selectedModules.length > 0;
+        }
         return true;
     };
 
     const handleNext = () => {
-        if (validateStep() && currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
+        if (validateStep()) {
+            setShowErrors(false);
+            if (currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
+        } else {
+            setShowErrors(true);
+        }
     };
 
     const handlePrevious = () => {
+        setShowErrors(false);
         if (currentStep > 0) setCurrentStep(currentStep - 1);
     };
 
@@ -64,65 +117,67 @@ const SchoolVisitWizard = ({ modules, onSubmit, onCancel, editingVisit, loading 
     };
 
     const handleFormSubmit = () => {
-        if (currentStep === steps.length - 1) {
+        if (validateStep()) {
             onSubmit(formData);
+        } else {
+            setShowErrors(true);
         }
     };
 
     const updateField = (field, value) => setFormData({ ...formData, [field]: value });
 
 
-  const PRICING = {
-  S500: {
-    Web: { Quarterly: 18, Yearly: 15 },
-    "Web+App": { Quarterly: 22, Yearly: 18 }
-  },
-  S1000: {
-    Web: { Quarterly: 15, Yearly: 12 },
-    "Web+App": { Quarterly: 20, Yearly: 15 }
-  }
-};
+    const PRICING = {
+        S500: {
+            Web: { Quarterly: 18, Yearly: 15 },
+            "Web+App": { Quarterly: 22, Yearly: 18 }
+        },
+        S1000: {
+            Web: { Quarterly: 15, Yearly: 12 },
+            "Web+App": { Quarterly: 20, Yearly: 15 }
+        }
+    };
 
-const getSlab = (strength) => strength < 1000 ? "S500" : "S1000";
+    const getSlab = (strength) => strength < 1000 ? "S500" : "S1000";
 
-const getMonths = (billing) => {
-  switch (billing) {
-    case "Monthly": return 1;
-    case "Quarterly": return 3;
-    case "HalfYearly": return 6;
-    case "Yearly": return 12;
-    default: return 1;
-  }
-};
+    const getMonths = (billing) => {
+        switch (billing) {
+            case "Monthly": return 1;
+            case "Quarterly": return 3;
+            case "HalfYearly": return 6;
+            case "Yearly": return 12;
+            default: return 1;
+        }
+    };
 
-const getRateType = (billing) => {
-  return billing === "Yearly" ? "Yearly" : "Quarterly";
-};
+    const getRateType = (billing) => {
+        return billing === "Yearly" ? "Yearly" : "Quarterly";
+    };
 
-const calculatePricing = (data) => {
-  const strength = Number(data.schoolStrenght);
-  const platform = data.requiredplatform;
-  const billing = data.billingFrequency;
+    const calculatePricing = (data) => {
+        const strength = Number(data.schoolStrenght);
+        const platform = data.requiredplatform;
+        const billing = data.billingFrequency;
 
-  if (!strength || !platform || !billing) return null;
+        if (!strength || !platform || !billing) return null;
 
-  const slab = getSlab(strength);
-  const pricing = PRICING[slab]?.[platform];
-  if (!pricing) return null;
+        const slab = getSlab(strength);
+        const pricing = PRICING[slab]?.[platform];
+        if (!pricing) return null;
 
-  const rateType = getRateType(billing); // 🔥 key rule
-  const monthlyRate = pricing[rateType];
+        const rateType = getRateType(billing); // 🔥 key rule
+        const monthlyRate = pricing[rateType];
 
-  const months = getMonths(billing);
+        const months = getMonths(billing);
 
-  const finalTotal = monthlyRate * months * strength;
+        const finalTotal = monthlyRate * months * strength;
 
-  return {
-    monthlyRate,
-    months,
-    finalTotal
-  };
-};
+        return {
+            monthlyRate,
+            months,
+            finalTotal
+        };
+    };
 
     useEffect(() => {
         const result = calculatePricing(formData);
@@ -142,7 +197,18 @@ const calculatePricing = (data) => {
 
 
 
-    const inputStyle = { width: '100%', padding: '10px 12px', border: '1px solid #ddd', borderRadius: '6px', fontSize: '14px', background: '#fff', color: '#000' };
+    const inputStyle = { width: '100%', padding: '10px 12px', border: '1px solid #ddd', borderRadius: '6px', fontSize: '14px', background: '#fff', color: '#000', transition: 'border-color 0.2s' };
+
+    const getInputStyle = (field, isSelect = false) => {
+        const value = formData[field];
+        const isInvalid = showErrors && !value;
+        return {
+            ...inputStyle,
+            borderColor: isInvalid ? '#ff4d4f' : '#ddd',
+            outline: isInvalid ? 'none' : undefined,
+            boxShadow: isInvalid ? '0 0 0 2px rgba(255, 77, 79, 0.1)' : 'none'
+        };
+    };
 
     return (
         <div style={{ background: '#fff', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', border: '1px solid #e5e5e5', marginBottom: '24px' }}>
@@ -200,15 +266,15 @@ const calculatePricing = (data) => {
                 <div style={{ padding: '24px', maxHeight: '400px', overflowY: 'auto' }}>
                     {currentStep === 0 && (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>School Name *</label><input type="text" value={formData.schoolName} onChange={(e) => updateField('schoolName', e.target.value)} disabled={editingVisit} required style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>School Strength</label><input type="number" value={formData.schoolStrenght} onChange={(e) => updateField('schoolStrenght', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Contact Person *</label><input type="text" value={formData.contactPersonName} onChange={(e) => updateField('contactPersonName', e.target.value)} required style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Designation</label><input type="text" value={formData.designation} onChange={(e) => updateField('designation', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Contact Number *</label><input type="tel" value={formData.contactNo} onChange={(e) => updateField('contactNo', e.target.value)} required style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Email ID</label><input type="email" value={formData.emailId} onChange={(e) => updateField('emailId', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Decision Maker Name</label><input type="text" value={formData.decisionMakerName} onChange={(e) => updateField('decisionMakerName', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Decision TimeLine</label><input type="text" value={formData.decisionTimeline} onChange={(e) => updateField('decisionTimeline', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Location City *</label><input type="text" value={formData.locationCity} onChange={(e) => updateField('locationCity', e.target.value)} disabled={editingVisit} required style={inputStyle} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>School Name *</label><input type="text" value={formData.schoolName} onChange={(e) => updateField('schoolName', e.target.value)} disabled={editingVisit} required style={getInputStyle('schoolName')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>School Strength *</label><input type="number" value={formData.schoolStrenght} onChange={(e) => updateField('schoolStrenght', e.target.value)} required style={getInputStyle('schoolStrenght')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Contact Person *</label><input type="text" value={formData.contactPersonName} onChange={(e) => updateField('contactPersonName', e.target.value)} required style={getInputStyle('contactPersonName')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Designation *</label><input type="text" value={formData.designation} onChange={(e) => updateField('designation', e.target.value)} required style={getInputStyle('designation')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Contact Number *</label><input type="tel" value={formData.contactNo} onChange={(e) => updateField('contactNo', e.target.value)} required style={getInputStyle('contactNo')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Email ID *</label><input type="email" value={formData.emailId} onChange={(e) => updateField('emailId', e.target.value)} required style={getInputStyle('emailId')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Decision Maker Name *</label><input type="text" value={formData.decisionMakerName} onChange={(e) => updateField('decisionMakerName', e.target.value)} required style={getInputStyle('decisionMakerName')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Decision TimeLine *</label><input type="text" value={formData.decisionTimeline} onChange={(e) => updateField('decisionTimeline', e.target.value)} required style={getInputStyle('decisionTimeline')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Location City *</label><input type="text" value={formData.locationCity} onChange={(e) => updateField('locationCity', e.target.value)} disabled={editingVisit} required style={getInputStyle('locationCity')} /></div>
 
                         </div>
                     )}
@@ -217,16 +283,17 @@ const calculatePricing = (data) => {
 
                     {currentStep === 1 && (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Boards</label><input type="text" value={formData.boards} onChange={(e) => updateField('boards', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Current System</label><input type="text" value={formData.currentSystem} onChange={(e) => updateField('currentSystem', e.target.value)} style={inputStyle} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Boards *</label><input type="text" value={formData.boards} onChange={(e) => updateField('boards', e.target.value)} required style={getInputStyle('boards')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Current System *</label><input type="text" value={formData.currentSystem} onChange={(e) => updateField('currentSystem', e.target.value)} required style={getInputStyle('currentSystem')} /></div>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
-                                    Platform Required
+                                    Platform Required *
                                 </label>
                                 <select
                                     value={formData.requiredplatform}
                                     onChange={(e) => updateField('requiredplatform', e.target.value)}
-                                    style={inputStyle}
+                                    required
+                                    style={getInputStyle('requiredplatform')}
                                 >
                                     <option value="">Select</option>
                                     <option value="Web">Web Only</option>
@@ -236,12 +303,13 @@ const calculatePricing = (data) => {
                             </div>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
-                                    Billing Frequency
+                                    Billing Frequency *
                                 </label>
                                 <select
                                     value={formData.billingFrequency}
                                     onChange={(e) => updateField('billingFrequency', e.target.value)}
-                                    style={inputStyle}
+                                    required
+                                    style={getInputStyle('billingFrequency')}
                                 >
                                     <option value="">Select</option>
                                     <option value="Monthly">Monthly</option>
@@ -250,23 +318,49 @@ const calculatePricing = (data) => {
                                     <option value="Yearly">Yearly</option>
                                 </select>
                             </div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Number of Users</label><input type="number" value={formData.noOfUsers} onChange={(e) => updateField('noOfUsers', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Cost Per Member</label><input type="number" value={formData.costPerMember} onChange={(e) => updateField('costPerMember', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Budget Range</label><input type="number" value={formData.budgetRange} onChange={(e) => updateField('budgetRange', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Payment Gateway Preference</label><input type="text" value={formData.paymentGatewayPreference} onChange={(e) => updateField('paymentGatewayPreference', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Proposal Sent</label><select value={formData.proposalSent} onChange={(e) => updateField('proposalSent', e.target.value)} style={inputStyle}><option value="">Select</option><option value="YES">Yes</option><option value="NO">No</option></select></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Propsal Date</label><input type="date" value={formData.proposalDate} onChange={(e) => updateField('proposalDate', e.target.value)} style={inputStyle} /></div>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Expected Go-Live Date</label><input type="date" value={formData.expectedGoLiveDate} onChange={(e) => updateField('expectedGoLiveDate', e.target.value)} style={inputStyle} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Number of Users *</label><input type="number" value={formData.noOfUsers} onChange={(e) => updateField('noOfUsers', e.target.value)} required style={getInputStyle('noOfUsers')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Cost Per Member *</label><input type="number" value={formData.costPerMember} onChange={(e) => updateField('costPerMember', e.target.value)} required style={getInputStyle('costPerMember')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Budget Range *</label><input type="number" value={formData.budgetRange} onChange={(e) => updateField('budgetRange', e.target.value)} required style={getInputStyle('budgetRange')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Payment Gateway Preference *</label><input type="text" value={formData.paymentGatewayPreference} onChange={(e) => updateField('paymentGatewayPreference', e.target.value)} required style={getInputStyle('paymentGatewayPreference')} /></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Proposal Sent *</label><select value={formData.proposalSent} onChange={(e) => updateField('proposalSent', e.target.value)} required style={getInputStyle('proposalSent')}><option value="">Select</option><option value="YES">Yes</option><option value="NO">No</option></select></div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Proposal Date *</label>
+                                <div className="date-input-wrapper" style={{ borderColor: showErrors && !formData.proposalDate ? '#ff4d4f' : '#ddd', borderWidth: '1px', borderStyle: 'solid', borderRadius: '6px' }}>
+                                    <input
+                                        type="date"
+                                        value={formData.proposalDate || ''}
+                                        onChange={(e) => updateField('proposalDate', e.target.value)}
+                                        required
+                                        className="wizard-input"
+                                        style={{ border: 'none', width: '100%' }}
+                                    />
+                                    <Calendar className="calendar-icon-svg" size={18} />
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Expected Go-Live Date *</label>
+                                <div className="date-input-wrapper" style={{ borderColor: showErrors && !formData.expectedGoLiveDate ? '#ff4d4f' : '#ddd', borderWidth: '1px', borderStyle: 'solid', borderRadius: '6px' }}>
+                                    <input
+                                        type="date"
+                                        value={formData.expectedGoLiveDate || ''}
+                                        onChange={(e) => updateField('expectedGoLiveDate', e.target.value)}
+                                        required
+                                        className="wizard-input"
+                                        style={{ border: 'none', width: '100%' }}
+                                    />
+                                    <Calendar className="calendar-icon-svg" size={18} />
+                                </div>
+                            </div>
                         </div>
                     )}
 
                     {currentStep === 2 && (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Data Migration Required</label><select value={formData.dataMigrationRequired} onChange={(e) => updateField('dataMigrationRequired', e.target.value)} style={inputStyle}><option value="">Select</option><option value="YES">Yes</option><option value="NO">No</option></select></div>
+                            <div><label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Data Migration Required *</label><select value={formData.dataMigrationRequired} onChange={(e) => updateField('dataMigrationRequired', e.target.value)} required style={getInputStyle('dataMigrationRequired')}><option value="">Select</option><option value="YES">Yes</option><option value="NO">No</option></select></div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Custom Features Required</label>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Custom Features Required *</label>
                                 <select
-
+                                    required
                                     value={formData.customFeaturesRequired}
                                     onChange={(e) => {
                                         updateField('customFeaturesRequired', e.target.value);
@@ -280,7 +374,7 @@ const calculatePricing = (data) => {
                                             updateField('customFeatureDescription', '');
                                         }
                                     }}
-                                    style={inputStyle}
+                                    style={getInputStyle('customFeaturesRequired')}
                                 >
                                     <option value="">Select</option>
                                     <option value="YES">Yes</option>
@@ -292,11 +386,12 @@ const calculatePricing = (data) => {
               <option value="NO">No</option></select></div> */}
                             <div>
                                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
-                                    ID Cards
+                                    ID Cards *
                                 </label>
 
                                 <select
                                     value={formData.idCards}
+                                    required
                                     onChange={(e) => {
                                         const value = e.target.value;
 
@@ -306,7 +401,7 @@ const calculatePricing = (data) => {
                                             rfidIntegration: '' // ALWAYS reset when ID Cards changes
                                         }));
                                     }}
-                                    style={inputStyle}
+                                    style={getInputStyle('idCards')}
                                 >
                                     <option value="">Select</option>
                                     <option value="Premium">Premium</option>
@@ -318,13 +413,14 @@ const calculatePricing = (data) => {
                             {(formData.idCards === 'Premium' || formData.idCards === 'Normal') && (
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
-                                        RFID Integration
+                                        RFID Integration *
                                     </label>
 
                                     <select
                                         value={formData.rfidIntegration}
                                         onChange={(e) => updateField('rfidIntegration', e.target.value)}
-                                        style={inputStyle}
+                                        required
+                                        style={getInputStyle('rfidIntegration')}
                                     >
                                         <option value="">Select</option>
                                         <option value="YES">Yes</option>
@@ -335,11 +431,12 @@ const calculatePricing = (data) => {
 
                             <div>
                                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
-                                    Demo Required
+                                    Demo Required *
                                 </label>
 
                                 <select
                                     value={formData.demoRequired}
+                                    required
                                     onChange={(e) => {
                                         const value = e.target.value;
 
@@ -349,7 +446,7 @@ const calculatePricing = (data) => {
                                             demoDate: null // ALWAYS reset when ID Cards changes
                                         }));
                                     }}
-                                    style={inputStyle}
+                                    style={getInputStyle('demoRequired')}
                                 >
                                     <option value="">Select</option>
                                     <option value="YES">Yes</option>
@@ -360,15 +457,19 @@ const calculatePricing = (data) => {
                             {formData.demoRequired === 'YES' && (
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>
-                                        Demo Date
+                                        Demo Date *
                                     </label>
-
-                                    <input
-                                        type="date"
-                                        value={formData.demoDate}
-                                        onChange={(e) => updateField('demoDate', e.target.value)}
-                                        style={inputStyle}
-                                    />
+                                    <div className="date-input-wrapper" style={{ borderColor: showErrors && !formData.demoDate ? '#ff4d4f' : '#ddd', borderWidth: '1px', borderStyle: 'solid', borderRadius: '6px' }}>
+                                        <input
+                                            type="date"
+                                            value={formData.demoDate || ''}
+                                            onChange={(e) => updateField('demoDate', e.target.value)}
+                                            required
+                                            className="wizard-input"
+                                            style={{ border: 'none', width: '100%' }}
+                                        />
+                                        <Calendar className="calendar-icon-svg" size={18} />
+                                    </div>
                                 </div>
                             )}
 
@@ -381,7 +482,7 @@ const calculatePricing = (data) => {
                     {currentStep === 3 && (
                         <div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Select Modules</h3>
+                                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Select Modules *</h3>
                                 <button
                                     type="button"
                                     onClick={() =>
@@ -418,7 +519,7 @@ const calculatePricing = (data) => {
                                             style={{
                                                 padding: '14px',
                                                 background: isSelected ? '#f0f4ff' : '#f8f9fa',
-                                                border: isSelected ? '2px solid #667eea' : '2px solid #e5e5e5',
+                                                border: isSelected ? '2px solid #667eea' : (showErrors && formData.selectedModules.length === 0 ? '2px solid #ff4d4f' : '2px solid #e5e5e5'),
                                                 borderRadius: '8px'
                                             }}
                                         >
@@ -510,56 +611,51 @@ const calculatePricing = (data) => {
                     <div style={{ display: 'flex', gap: '10px' }}>
                         {currentStep > 0 && <button type="button" onClick={handlePrevious} style={{ padding: '10px 20px', background: '#fff', color: '#667eea', border: '2px solid #667eea', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>← Previous</button>}
                         {currentStep < steps.length - 1 ? (
-                            <button type="button" onClick={handleNext} disabled={!validateStep()} style={{ padding: '10px 20px', background: validateStep() ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#ccc', color: '#fff', border: 'none', borderRadius: '6px', cursor: validateStep() ? 'pointer' : 'not-allowed', fontSize: '14px', fontWeight: '600' }}>Next →</button>
+                            <button type="button" onClick={handleNext} style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>Next →</button>
                         ) : (
                             <button type="submit" disabled={loading} onClick={handleFormSubmit} style={{ padding: '10px 24px', background: loading ? '#ccc' : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', color: '#fff', border: 'none', borderRadius: '6px', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: '600' }}>{loading ? 'Submitting...' : editingVisit ? 'Update Visit' : 'Submit Visit'}</button>
                         )}
                     </div>
                 </div>
                 {showCustomFeatureModal && (
-                    <div style={{
-                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'rgba(22, 2, 2, 0.5)', display: 'flex',
-                        alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                    }}>
-                        <div style={{
-                            background: '#fff', padding: '24px', borderRadius: '10px',
-                            width: '400px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
-                            color: '#1a202c'
-                        }}>
-                            <h3 style={{ color: '#667eea' }}>Enter Custom Feature Description</h3>
-
-                            <textarea
-                                value={customFeatureDescription}
-                                onChange={(e) => setCustomFeatureDescription(e.target.value)}
-                                placeholder="Describe required custom features..."
-                                style={{ width: '100%', minHeight: '90px', padding: '10px', border: '1px solid #ddd', borderRadius: '6px', color: '#1a202c' }}
-                            />
-
-                            <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                    <div className="sv-modal-overlay">
+                        <div className="sv-modal-container">
+                            <div className="sv-modal-header">
+                                <h3 className="sv-modal-title">Custom Features Required</h3>
+                            </div>
+                            <div className="sv-modal-body">
+                                <p className="sv-modal-helper-text">
+                                    Please provide a detailed description of the custom features required for this school.
+                                </p>
+                                <textarea
+                                    className="sv-modal-textarea"
+                                    value={customFeatureDescription}
+                                    onChange={(e) => setCustomFeatureDescription(e.target.value)}
+                                    placeholder="Describe the specific custom features needed..."
+                                />
+                            </div>
+                            <div className="sv-modal-footer">
                                 <button
                                     type="button"
+                                    className="sv-modal-btn sv-modal-btn-cancel"
                                     onClick={() => {
                                         setShowCustomFeatureModal(false);
                                         updateField('customFeaturesRequired', 'NO');
                                     }}
-                                    style={{ flex: 1, background: '#6c757d', color: '#fff', padding: '10px', border: 'none', borderRadius: '6px' }}
                                 >
                                     Cancel
                                 </button>
-
                                 <button
                                     type="button"
+                                    className="sv-modal-btn sv-modal-btn-save"
                                     onClick={() => {
                                         updateField('customFeatureDescription', customFeatureDescription);
                                         setShowCustomFeatureModal(false);
                                     }}
-                                    style={{ flex: 1, background: '#667eea', color: '#fff', padding: '10px', border: 'none', borderRadius: '6px' }}
                                 >
-                                    Save
+                                    Save Changes
                                 </button>
                             </div>
-
                         </div>
                     </div>
                 )}

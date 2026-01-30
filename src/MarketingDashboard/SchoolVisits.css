@@ -5,12 +5,23 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+.sticky-header-container {
+    position: sticky;
+    top: -20px;
+    z-index: 110;
+    background: #fafafa;
+    margin-left: -2px;
+    margin-right: -2px;
+    padding: 0 2px;
+}
+
 .header-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
-    padding-bottom: 8px;
+    margin-bottom: 0;
+    padding: 12px 0 4px 0;
+    background: #fafafa;
 }
 
 .header-title-wrapper {
@@ -59,10 +70,11 @@
     gap: 8px;
     margin-bottom: 24px;
     overflow-x: auto;
-    padding: 4px 2px;
-    /* Added 2px left padding as requested */
+    padding: 4px 2px 12px 2px;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    background: #fafafa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .filter-container::-webkit-scrollbar {
@@ -100,6 +112,19 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 20px;
+    padding-bottom: 40px;
+}
+
+@media (min-width: 900px) {
+    .visits-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1400px) {
+    .visits-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .visit-card {
@@ -436,4 +461,28 @@
 .btn-action:hover {
     opacity: 0.9;
     transform: scale(1.02);
+}
+
+/* Custom Scrollbar for the main content area */
+.content-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content-area::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.content-area::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* For Firefox */
+.content-area {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
 }
